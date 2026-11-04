@@ -101,3 +101,9 @@ git commit -m "build: bump picoros-usb-eth"
 
 `git add` comes first: `git submodule update` checks out what the index
 records, and would otherwise put the old version back.
+
+## Licence
+
+BSD-3-Clause, see [LICENSE](LICENSE). The submodules keep their own:
+picoros-usb-eth and the PAA5160E1 library are BSD-3-Clause, and the components
+picoros-usb-eth pins list theirs in its README.
