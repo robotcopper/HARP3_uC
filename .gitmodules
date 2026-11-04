@@ -1,0 +1,6 @@
+[submodule "lib/picoros-usb-eth"]
+	path = lib/picoros-usb-eth
+	url = https://github.com/robotcopper/picoros-usb-eth.git
+[submodule "mobile_base_pico/lib/PAA5160E1_Pico_Library"]
+	path = mobile_base_pico/lib/PAA5160E1_Pico_Library
+	url = https://github.com/robotcopper/PAA5160E1_Pico_Library.git
