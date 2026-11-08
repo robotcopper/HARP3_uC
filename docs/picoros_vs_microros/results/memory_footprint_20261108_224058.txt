@@ -1,0 +1,13 @@
+memory_footprint 2026-11-08T22:40:58 static memory, bytes
+[picoros_rp2040_basic]
+  flash=262064 (255.9 KB)
+  static=65676 (64.1 KB)
+  freertos=131072 (128.0 KB)
+  malloc=65396 (63.9 KB)
+  ram code=3802 (3.7 KB)
+[microros_rp2040_basic]
+  flash=374260 (365.5 KB)
+  static=121572 (118.7 KB)
+  freertos=131072 (128.0 KB)
+  malloc=9500 (9.3 KB)
+  ram code=23186 (22.6 KB)

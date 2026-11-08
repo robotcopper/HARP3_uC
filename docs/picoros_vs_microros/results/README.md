@@ -28,7 +28,15 @@ microseconds.
 `service_rtt.py` writes:
 
 * `[late_join]`, with five delays in milliseconds;
-* `[idle]` and `[joint]`, each with the same lines plus the service round trip.
+* `[idle]` and `[joint]`, each with the same lines plus the service round trip;
+* `[memory]`, in the runs labelled `_memory`: in bytes, from the first stats
+  after each step, the FreeRTOS heap free and its lowest since boot, and for
+  the micro-ROS firmware newlib's `malloc()` bytes in use and arena and the
+  unused stack of each task.
+
+`memory_footprint.py` writes one section per ELF, in bytes and in KB of 1024
+bytes: `flash`, `static` RAM besides the FreeRTOS heap, `freertos` heap,
+`malloc` region and `ram code`, the functions linked to run from RAM.
 
 A `profile of phase joint:` line names the absolute path the profile was
 written to on the machine that measured. The profile is the `_profile.txt`
@@ -87,3 +95,17 @@ them with micro-ROS's.
 | `host_ref_client_20261107_190841.txt` | `host_reference.py --mode client`, through the router |
 | `host_ref_service_peer_20261107_230738.txt` | `service_rtt.py --host-reference peer` |
 | `host_ref_service_client_20261107_230801.txt` | `service_rtt.py --host-reference client` |
+
+## Memory
+
+| File | Run |
+| --- | --- |
+| `memory_footprint_20261108_224058.txt` | `memory_footprint.py` on the ELF files of `benchmarks/picoros_rp2040_basic` and `benchmarks/microros_rp2040_basic` measured above |
+| `picoros_rp2040_basic_memory_20261108_224919.txt` | `service_rtt.py` on `benchmarks/picoros_rp2040_basic` just flashed |
+| `microros_rp2040_basic_memory_20261108_225331.txt` | the same on `benchmarks/microros_rp2040_basic` |
+
+The two `service_rtt.py` runs repeat those of 7 November with the same
+firmwares, to record the memory. Their round trips are 0.4 ms longer for both
+firmwares, with the same idle time on the board: the difference is on the host
+side and not yet explained. The latencies of the comparison come from the runs
+of 7 November.

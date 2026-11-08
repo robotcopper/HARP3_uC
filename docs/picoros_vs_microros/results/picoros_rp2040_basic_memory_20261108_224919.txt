@@ -1,0 +1,23 @@
+picoros_rp2040_basic_memory 2026-11-08T22:49:19 service round trip and late joining
+[late_join] pico/boot: received 5/5
+  delay from subscription to message ms: 4.5 4.4 4.3 4.3 4.7
+  message: warm start, up 851 ms, sntp not synced
+[idle]
+  idle mean=80.2 % min=80 max=81
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=1898 min=2872 p10=3134 median=3291 mean=3337 p90=3586 max=5357 sd=259 us
+  round trip n=1000 min=2507 p10=3014 median=3297 mean=3316 p90=3608 max=4990 sd=293 us lost=0
+[joint]
+  idle mean=70.2 % min=70 max=71
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=1906 min=2850 p10=3193 median=3355 mean=3465 p90=3768 max=6763 sd=402 us
+  downlink 1 s averages n=19 min=555 p10=567 median=608 mean=609 p90=652 max=670 sd=30 us
+  downlink max - min per 1 s n=19 min=1493 p10=1547 median=1698 mean=1691 p90=1909 max=1990 sd=120 us
+  downlink + uplink mean=4074 us
+  downlink + uplink per stats period n=19 min=3949 p10=3997 median=4056 mean=4073 p90=4146 max=4170 sd=54 us
+  round trip n=1000 min=2777 p10=3153 median=3489 mean=3546 p90=3988 max=5834 sd=375 us lost=0
+[memory] bytes, from the first stats after each step
+  start: heap free=57528 min=57376
+  after late_join: heap free=57528 min=56504
+  after idle: heap free=57528 min=56504
+  after joint: heap free=57528 min=56504

@@ -56,8 +56,8 @@ At 200 MHz, once fixed, the two stacks are on par for median latency and CPU loa
 | Downlink spread within one second, median | 0.61 ms | 1.04 ms |
 | Service round trip, median / 90th percentile / maximum | 2.88 / 3.15 / 4.30 ms | 2.90 / 3.87 / 7.76 ms |
 | Late joiner on a transient local topic | 3.3 to 5.3 ms | 3.2 to 3.6 ms |
-| Flash | 260 KB | 369 KB |
-| FreeRTOS heap left, of 128 KB | 57.7 KB | 30.6 KB |
+| Flash | 255.9 KB | 365.5 KB |
+| FreeRTOS heap left after the service runs, of 128 KB | 56.2 KB | 29.5 KB |
 | RAM left for `malloc()` | 63.9 KB | 9.3 KB |
 
 At 125 MHz, the RP2040's default clock, <span style="color:#e08a1e">**Pico-ROS**</span> keeps a small lead: 70.5 % idle against 69.0 % with JointState, and 4.84 ms against 5.16 to 5.27 ms of downlink + uplink.
@@ -170,6 +170,8 @@ They differ where the stacks do:
 
 **Setup.** One Raspberry Pi Pico, plugged into the host that runs `rmw_zenohd` with its default configuration and `chrony`. The scripts run on that host, which is otherwise idle. Each firmware is built in Release and flashed with `picotool load -f -x`.
 
+Delays measured on the host move from one session to the next. On another evening, the same two firmwares gave service round trips 0.4 ms longer, both of them, with the same idle time on the board. The cause, on the host side, is not yet known. Every latency on this page therefore comes from runs of the same day, 7 November; the memory figures, measured on the board, come from those other runs.
+
 **Publish/subscribe, [`measure.py`](https://github.com/robotcopper/HARP3_uC/blob/main/benchmarks/tools/measure.py).** It runs three phases:
 
 1. 30 s subscribed to `pico/odom` and `pico/stats`.
@@ -196,6 +198,9 @@ The sum is computed for each stats period, and only sums are compared. Two runs 
 
 - **Late joining:** a new reliable, transient local subscription to `pico/boot` waits for the message the board published when it started. The script times from the creation of the subscription to the message, five times.
 - **Round trip:** 1000 calls of `pico/ping`, each sent 10 to 20 ms after the previous answer, at random, so that the calls meet every phase of the board's cadence. The round trip runs from `call_async()` to the completed future, on the host's clock alone. This is done once with the odometry subscribed, then again with JointState at 99 Hz.
+- **Memory:** the free FreeRTOS heap and its lowest since boot, and for micro-ROS the unused stack of each task, read from `pico/stats` at the start and after each of the steps above, on a board just flashed.
+
+**Static memory, [`memory_footprint.py`](https://github.com/robotcopper/HARP3_uC/blob/main/benchmarks/tools/memory_footprint.py).** Flash, static RAM, FreeRTOS heap and the region left for `malloc()`, from the ELF files and the symbols of the Pico SDK's linker script.
 
 **Host reference, [`host_reference.py`](https://github.com/robotcopper/HARP3_uC/blob/main/benchmarks/tools/host_reference.py).** The same exchanges with a stand-in for the board on the host, in two modes:
 - peer, the default of `rmw_zenoh_cpp`, where data goes directly between processes;
@@ -360,17 +365,20 @@ The offset is less accurate than these steps suggest. With the same firmware fam
 
 | | Pico-ROS | micro-ROS |
 | --- | --- | --- |
-| Flash: code, read-only data, initial data | 260 KB | 369 KB |
-| Static RAM besides the FreeRTOS heap | 63.9 KB | 118.4 KB, of which 19 KB of code in RAM |
-| FreeRTOS heap, of 128 KB: left at run time | 57.7 KB | 31.8 KB at start, 30.6 KB under load |
-| RAM left for `malloc()` | 63.9 KB | 9.3 KB |
-| zenoh task stack, unused of 4 KB | | 1152 bytes after late joins and 2000 calls |
+| Flash: code, read-only data, initial data | 255.9 KB | 365.5 KB |
+| Static RAM besides the FreeRTOS heap | 64.1 KB | 118.7 KB |
+| of which code run from RAM | 3.7 KB | 22.6 KB |
+| FreeRTOS heap of 128 KB, free: at start / after the service runs / lowest | 56.2 / 56.2 / 55.2 KB | 30.7 / 29.5 / 26.5 KB |
+| RAM left for `malloc()` | 63.9 KB | 9.3 KB, of which newlib holds a 5.3 KB arena |
+| zenoh task stack of 4096 bytes, unused: at start / after the service runs | not reported | 2844 / 1152 bytes |
 
-The RP2040 has 264 KB of RAM. micro-ROS leaves about 37 KB of it free, Pico-ROS about 120 KB. 19 KB of the difference is a deliberate trade: code moved to RAM to save CPU.
+A KB here is 1024 bytes. The flash and RAM layout come from the ELF files, through `memory_footprint.py`; the heap and the stacks from `pico/stats`, through `service_rtt.py`, as described in [Method](#method). The raw figures are in [`results/`](https://github.com/robotcopper/HARP3_uC/tree/main/docs/picoros_vs_microros/results), under Memory.
 
-The FreeRTOS heap holds the task stacks and everything zenoh-pico and rmw_zenoh_pico allocate. The heap left stayed constant over 2000 service calls once the leak described below was fixed.
+The RP2040 has 264 KB of RAM: 256 KB of main RAM, which the static RAM, the FreeRTOS heap and the region left for `malloc()` share exactly, and two 4 KB banks for the initial stacks of the two cores. At the lowest point of the service runs, the free FreeRTOS heap and the region left for `malloc()` add up to about 36 KB with micro-ROS, and 119 KB with Pico-ROS; with micro-ROS, newlib already uses 3 KB of that region. 19 KB of the difference is a deliberate trade: code moved to RAM to save CPU.
 
-The zenoh task's stack is the tightest margin: 1152 bytes left of 4096 after late joins and 2000 service calls, against 2844 bytes at start. A stack overflow panics the board. That margin must be checked again on the mobile base firmware, whose traffic differs.
+The FreeRTOS heap holds the task stacks and everything zenoh-pico and rmw_zenoh_pico allocate. With micro-ROS, its free part fell by 600 bytes during the late joins, then by 600 more over the 2000 service calls; the leak described below would have taken 260 KB over those calls. With Pico-ROS it did not move.
+
+The zenoh task's stack is the tightest margin: 1152 bytes left of 4096 after the late joins, against 2844 at start, and no lower after the 2000 service calls. A stack overflow panics the board. That margin must be checked again on the mobile base firmware, whose traffic differs.
 
 <br>
 
@@ -418,7 +426,7 @@ The <span style="color:#e08a1e">**Pico-ROS**</span> fork carries its own fixes, 
 
 **Performance.** At 200 MHz the two stacks are equivalent: 80 to 82 % idle with a 99 Hz command stream, and 3.9 ms of downlink + uplink. Pico-ROS keeps a structural advantage in the tails, because its callbacks run in the zenoh task: half the downlink spread and half the service maximum. At 125 MHz it is ahead by 1.5 points and 0.3 to 0.4 ms.
 
-**Memory.** micro-ROS costs 110 KB more flash and leaves about 37 KB of RAM free against 120 KB.
+**Memory.** micro-ROS costs 110 KB more flash and leaves about 36 KB of RAM to allocate from, against 119 KB.
 
 **Choice.** HARP3 runs micro-ROS on its boards because its API is the standard one:
 - the firmware is written with `rcl` and `rclc`, like any micro-ROS application, documented and known to the ROS community;
@@ -431,7 +439,7 @@ Moving from a serial agent to Zenoh is a change of rmw, not of application code.
 
 - Two forks to maintain until their fixes are merged; rmw_zenoh_pico's upstream merges slowly.
 - Callbacks must stay short, since the executor runs them one after the other. Periodic work uses a task and a guard condition, not an `rcl` timer.
-- RAM is tight: 30 KB of FreeRTOS heap and 1.1 KB on the zenoh task's stack.
+- RAM is tight: 26.5 KB of FreeRTOS heap at its lowest and 1.1 KB on the zenoh task's stack.
 
 The next step is porting the mobile base firmware, recorded in HARP3_ROS's ADR 0011, and proposing the fixes upstream.
 
@@ -453,6 +461,7 @@ source /opt/ros/lyrical/setup.bash
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 python3 ../tools/measure.py microros_rp2040_basic_99hz --rate 99
 python3 ../tools/service_rtt.py microros_rp2040_basic_service
+python3 ../tools/memory_footprint.py memory_footprint build/rp2040/microros_rp2040_basic.elf
 ```
 
 `-DPICO_USE_FASTEST_SUPPORTED_CLOCK=OFF` builds for 125 MHz. Results are written to [`results/`](https://github.com/robotcopper/HARP3_uC/tree/main/docs/picoros_vs_microros/results), whose README says which run each figure comes from. `benchmarks/tools/figures.py` redraws every chart and diagram of this page from them.

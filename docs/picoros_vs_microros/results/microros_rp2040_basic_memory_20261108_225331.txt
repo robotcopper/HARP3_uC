@@ -1,0 +1,36 @@
+microros_rp2040_basic_memory 2026-11-08T22:53:31 service round trip and late joining, board clock 200 MHz
+[late_join] pico/boot: received 5/5
+  delay from subscription to message ms: 3.4 3.9 3.8 4.4 4.2
+  message: warm start, up 923 ms, sntp not synced
+[idle]
+  idle mean=80.0 % min=80 max=80
+  cpu mean %: app=12.5 IDLE=80.5 usb=1.4 cadence=0.3 tcpip=2.4 zenoh=2.5 Tmr Svc=0.0
+  xip hit mean=99.2 % acc mean=65877456/s misses mean=527020/s
+  rmw_wait per second: calls=147.9 ready=7.0 zero=0.0 short=0.0 signalled=140.1 timeout=0.0 raced=0.8
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=1915 min=2712 p10=2974 median=3111 mean=3137 p90=3332 max=5801 sd=175 us
+  split ambiguous per second: mean=0.0
+  round trip n=1000 min=2468 p10=3039 median=3309 mean=3462 p90=4432 max=8051 sd=539 us lost=0
+[joint]
+  idle mean=69.7 % min=69 max=70
+  cpu mean %: app=16.1 IDLE=70.1 usb=2.0 cadence=0.3 tcpip=3.9 zenoh=7.2 Tmr Svc=0.0
+  xip hit mean=98.5 % acc mean=58255137/s misses mean=852274/s
+  rmw_wait per second: calls=230.1 ready=21.3 zero=0.0 short=0.0 signalled=207.5 timeout=0.0 raced=1.3
+  joint received per second: mean=99.0 min=98 max=100
+  uplink n=1958 min=2800 p10=3062 median=3248 mean=3287 p90=3494 max=4964 sd=244 us
+  downlink 1 s averages n=19 min=929 p10=968 median=1021 mean=1026 p90=1123 max=1126 sd=49 us
+  downlink max - min per 1 s n=19 min=1413 p10=1441 median=1877 mean=2242 p90=5522 max=6053 sd=1240 us
+  before_rmw_us per 1 s: avg mean=491 min=51 max=1870
+  before_rmw_us max - min per 1 s n=19 min=578 p10=612 median=793 mean=897 p90=1601 max=1700 sd=326 us
+  in_executor_us per 1 s: avg mean=534 min=327 max=5796
+  in_executor_us max - min per 1 s n=19 min=975 p10=1049 median=1461 mean=1805 p90=5134 max=5450 sd=1214 us
+  split ambiguous per second: mean=0.0
+  subscription lookup per sample: mean=67.1 us max=297 us, samples per second mean=99.0
+  downlink + uplink mean=4313 us
+  downlink + uplink per stats period n=19 min=4223 p10=4243 median=4315 mean=4315 p90=4394 max=4427 sd=51 us
+  round trip n=1000 min=2728 p10=3189 median=3560 mean=3776 p90=4865 max=8374 sd=654 us lost=0
+[memory] bytes, from the first stats after each step
+  start: heap free=31408 min=29648 | malloc used=3060 arena=5404 | stack free app=26756 IDLE=1956 usb=2704 cadence=352 tcpip=3456 zenoh=2844 Tmr Svc=3928
+  after late_join: heap free=30808 min=29048 | malloc used=3060 arena=5404 | stack free app=26756 IDLE=1956 usb=2704 cadence=352 zenoh=1152 tcpip=3456 Tmr Svc=3928
+  after idle: heap free=30552 min=28040 | malloc used=3060 arena=5404 | stack free app=26756 IDLE=1956 usb=2688 cadence=336 zenoh=1152 tcpip=3456 Tmr Svc=3928
+  after joint: heap free=30216 min=27096 | malloc used=3060 arena=5404 | stack free app=26756 IDLE=1956 usb=2664 cadence=312 tcpip=3392 zenoh=1152 Tmr Svc=3928
