@@ -1,0 +1,18 @@
+host_ref_peer 2026-11-07T19:07:29 host reference mode=peer JointState at 99 Hz
+[no_joint]
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=176 p10=308 median=379 mean=376 p90=441 max=643 sd=54 us
+  split ambiguous per second: mean=0.0
+[joint]
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=3000 min=142 p10=272 median=350 mean=347 p90=416 max=587 sd=57 us
+  downlink 1 s averages n=30 min=559 p10=576 median=612 mean=607 p90=634 max=636 sd=22 us
+  downlink max - min per 1 s n=30 min=273 p10=395 median=451 mean=503 p90=732 max=871 sd=131 us
+  before_rmw_us per 1 s: avg mean=349 min=130 max=795
+  before_rmw_us max - min per 1 s n=30 min=207 p10=239 median=300 mean=314 p90=410 max=610 sd=82 us
+  in_executor_us per 1 s: avg mean=258 min=111 max=841
+  in_executor_us max - min per 1 s n=30 min=203 p10=279 median=350 mean=389 p90=602 max=727 sd=118 us
+  split ambiguous per second: mean=0.0
+  downlink + uplink mean=954 us
+  downlink + uplink per stats period n=30 min=894 p10=922 median=964 mean=954 p90=981 max=1003 sd=26 us
+  before_rmw + uplink mean=696 us

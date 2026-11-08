@@ -8,6 +8,8 @@ interfaces this firmware is generated from.
 | --- | --- |
 | [`mobile_base_pico/`](mobile_base_pico/README.md) | mobile base board: three steppers, odometry sensor, limit switches |
 | `lib/picoros-usb-eth/` | submodule, [picoros-usb-eth](https://github.com/robotcopper/picoros-usb-eth): Pico-ROS over Ethernet over USB, shared by every board |
+| [`benchmarks/`](benchmarks/README.md) | the Pico-ROS and micro-ROS test firmwares and the measurement scripts |
+| [`docs/picoros_vs_microros/`](docs/picoros_vs_microros/README.md) | Pico-ROS and micro-ROS over Zenoh compared: method, results, raw data |
 
 ## Prerequisites
 
@@ -105,5 +107,6 @@ records, and would otherwise put the old version back.
 ## Licence
 
 BSD-3-Clause, see [LICENSE](LICENSE). The submodules keep their own:
-picoros-usb-eth and the PAA5160E1 library are BSD-3-Clause, and the components
-picoros-usb-eth pins list theirs in its README.
+picoros-usb-eth and the PAA5160E1 library are BSD-3-Clause, the components
+picoros-usb-eth pins list theirs in its README, zenoh-pico is EPL-2.0 or
+Apache-2.0, and rmw_zenoh_pico Apache-2.0.

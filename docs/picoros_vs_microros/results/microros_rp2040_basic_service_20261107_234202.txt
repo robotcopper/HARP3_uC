@@ -1,0 +1,31 @@
+microros_rp2040_basic_service 2026-11-07T23:42:02 service round trip and late joining, board clock 200 MHz
+[late_join] pico/boot: received 5/5
+  delay from subscription to message ms: 3.2 3.6 3.4 3.5 3.3
+  message: warm start, up 924 ms, sntp not synced
+[idle]
+  idle mean=80.0 % min=79 max=85
+  cpu mean %: app=12.5 IDLE=80.4 usb=1.5 cadence=0.3 tcpip=2.5 zenoh=2.6 Tmr Svc=0.0
+  xip hit mean=99.2 % acc mean=65761330/s misses mean=549747/s
+  rmw_wait per second: calls=147.5 ready=8.0 zero=0.0 short=0.0 signalled=139.2 timeout=0.0 raced=0.3
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=1853 min=2089 p10=2364 median=2527 mean=2543 p90=2714 max=3604 sd=168 us
+  split ambiguous per second: mean=0.0
+  round trip n=1000 min=2449 p10=2665 median=2897 mean=3038 p90=3874 max=7759 sd=483 us lost=0
+[joint]
+  idle mean=69.3 % min=69 max=70
+  cpu mean %: app=16.3 IDLE=69.8 usb=2.1 cadence=0.3 tcpip=4.0 zenoh=7.3 Tmr Svc=0.0
+  xip hit mean=98.5 % acc mean=58035641/s misses mean=864380/s
+  rmw_wait per second: calls=230.7 ready=25.1 zero=0.0 short=0.0 signalled=203.6 timeout=0.0 raced=2.1
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=1898 min=2191 p10=2546 median=2864 mean=2885 p90=3179 max=4892 sd=299 us
+  downlink 1 s averages n=19 min=991 p10=999 median=1053 mean=1132 p90=1454 max=1457 sd=172 us
+  downlink max - min per 1 s n=19 min=1342 p10=1429 median=1789 mean=1771 p90=2124 max=2282 sd=234 us
+  before_rmw_us per 1 s: avg mean=577 min=172 max=1864
+  before_rmw_us max - min per 1 s n=19 min=585 p10=608 median=712 mean=780 p90=1241 max=1279 sd=195 us
+  in_executor_us per 1 s: avg mean=555 min=333 max=2342
+  in_executor_us max - min per 1 s n=19 min=834 p10=1031 median=1553 mean=1451 p90=1859 max=1995 sd=284 us
+  split ambiguous per second: mean=0.0
+  subscription lookup per sample: mean=66.3 us max=142 us, samples per second mean=99.0
+  downlink + uplink mean=4017 us
+  downlink + uplink per stats period n=19 min=3927 p10=3936 median=4031 mean=4018 p90=4110 max=4118 sd=60 us
+  round trip n=1000 min=2499 p10=2786 median=3108 mean=3334 p90=4245 max=8181 sd=656 us lost=0

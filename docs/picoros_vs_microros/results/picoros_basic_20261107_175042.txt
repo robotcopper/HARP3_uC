@@ -1,0 +1,20 @@
+picoros_basic 2026-11-07T17:50:42
+[no_joint]
+  idle mean=86.5 % min=86 max=87
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=10 p10=282 median=435 mean=459 p90=674 max=1128 sd=159 us
+[joint]
+  idle mean=69.0 % min=69 max=69
+  joint received per second: mean=100.0 min=99 max=101
+  uplink n=3000 min=342 p10=580 median=763 mean=768 p90=952 max=2865 sd=161 us
+  downlink 1 s averages n=30 min=4049 p10=4058 median=4080 mean=4081 p90=4108 max=4133 sd=18 us
+  downlink + uplink mean=4849 us
+  downlink + uplink per stats period n=30 min=4769 p10=4783 median=4843 mean=4849 p90=4931 max=5012 sd=59 us
+[joint_ping]
+  idle mean=68.3 % min=68 max=69
+  joint received per second: mean=100.0 min=99 max=101
+  uplink n=2101 min=312 p10=652 median=1551 mean=1299 p90=1824 max=3766 sd=510 us
+  downlink 1 s averages n=21 min=3131 p10=3148 median=3181 mean=3560 p90=4090 max=4102 sd=449 us
+  downlink + uplink mean=4859 us
+  downlink + uplink per stats period n=21 min=4776 p10=4790 median=4857 mean=4859 p90=4913 max=4951 sd=44 us
+  ping loss=0 % min=0.735 avg=1.270 max=3.503 mdev=0.637 ms

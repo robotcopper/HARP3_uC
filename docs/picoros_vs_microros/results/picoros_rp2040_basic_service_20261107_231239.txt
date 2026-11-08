@@ -1,0 +1,18 @@
+picoros_rp2040_basic_service 2026-11-07T23:12:39 service round trip and late joining
+[late_join] pico/boot: received 5/5
+  delay from subscription to message ms: 4.0 3.3 4.2 5.3 4.0
+  message: warm start, up 651 ms, sntp not synced
+[idle]
+  idle mean=80.4 % min=80 max=86
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=1852 min=1921 p10=2211 median=2410 mean=2503 p90=2877 max=5243 sd=316 us
+  round trip n=1000 min=2449 p10=2663 median=2875 mean=2901 p90=3147 max=4297 sd=222 us lost=0
+[joint]
+  idle mean=70.0 % min=69 max=71
+  joint received per second: mean=99.1 min=98 max=100
+  uplink n=1861 min=2417 p10=2662 median=2892 mean=3064 p90=3508 max=6590 sd=467 us
+  downlink 1 s averages n=18 min=315 p10=331 median=912 mean=764 p90=972 max=1004 sd=265 us
+  downlink max - min per 1 s n=18 min=1604 p10=1640 median=1777 mean=1780 p90=1948 max=2054 sd=106 us
+  downlink + uplink mean=3828 us
+  downlink + uplink per stats period n=18 min=3676 p10=3702 median=3816 mean=3814 p90=3911 max=3946 sd=71 us
+  round trip n=1000 min=2269 p10=2689 median=2985 mean=3042 p90=3456 max=4775 sd=345 us lost=0

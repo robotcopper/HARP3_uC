@@ -1,0 +1,29 @@
+cadence 2026-11-07T18:21:00
+[no_joint]
+  idle mean=83.2 % min=83 max=85
+  cpu mean %: app=11.9 IDLE=83.8 usb=1.3 cadence=0.5 zenoh=0.0 tcpip=2.2 Tmr Svc=0.0
+  xip hit mean=99.4 % acc mean=42662923/s misses mean=251635/s
+  rmw_wait per second: calls=100.0 ready=0.0 zero=0.0 short=0.0 signalled=100.0 timeout=0.0 missed=0.0
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=7607 p10=7860 median=7982 mean=7993 p90=8145 max=8489 sd=114 us
+[joint]
+  idle mean=68.0 % min=68 max=68
+  cpu mean %: app=18.2 IDLE=68.5 usb=1.8 cadence=0.5 tcpip=3.2 zenoh=7.4 Tmr Svc=0.0
+  xip hit mean=98.5 % acc mean=35682939/s misses mean=535244/s
+  rmw_wait per second: calls=199.0 ready=1.0 zero=0.0 short=0.0 signalled=198.0 timeout=0.0 missed=0.2
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=3000 min=7588 p10=7847 median=8032 mean=8040 p90=8245 max=9090 sd=153 us
+  downlink 1 s averages n=30 min=-3417 p10=-3381 median=-3285 mean=-3291 p90=-3178 max=-3148 sd=74 us
+  downlink + uplink mean=4749 us
+  downlink + uplink per stats period n=30 min=4577 p10=4647 median=4738 mean=4749 p90=4878 max=4932 sd=90 us
+[joint_ping]
+  idle mean=68.0 % min=68 max=68
+  cpu mean %: app=18.0 IDLE=68.8 usb=1.7 cadence=0.5 tcpip=3.3 zenoh=7.4 Tmr Svc=0.0
+  xip hit mean=98.5 % acc mean=35740116/s misses mean=536102/s
+  rmw_wait per second: calls=199.0 ready=1.0 zero=0.0 short=0.0 signalled=198.0 timeout=0.0 missed=0.3
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=2100 min=7495 p10=7702 median=7859 mean=7872 p90=8054 max=8664 sd=144 us
+  downlink 1 s averages n=21 min=-3156 p10=-3134 median=-3096 mean=-3097 p90=-3062 max=-3030 sd=35 us
+  downlink + uplink mean=4775 us
+  downlink + uplink per stats period n=21 min=4651 p10=4725 median=4771 mean=4775 p90=4840 max=4889 sd=56 us
+  ping loss=0 % min=0.618 avg=0.824 max=2.063 mdev=0.202 ms

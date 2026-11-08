@@ -1,0 +1,42 @@
+rx_split_99hz 2026-11-07T18:48:14 JointState at 99 Hz
+[no_joint]
+  idle mean=83.2 % min=83 max=85
+  cpu mean %: app=11.9 IDLE=83.7 usb=1.3 cadence=0.5 zenoh=0.1 tcpip=2.2 Tmr Svc=0.0
+  xip hit mean=99.4 % acc mean=42618663/s misses mean=252816/s
+  rmw_wait per second: calls=100.0 ready=0.0 zero=0.0 short=0.0 signalled=100.0 timeout=0.0 raced=0.0
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=1816 p10=2135 median=2295 mean=2307 p90=2497 max=2865 sd=140 us
+  split ambiguous per second: mean=0.0
+[joint]
+  idle mean=68.0 % min=68 max=68
+  cpu mean %: app=18.0 IDLE=68.8 usb=1.7 cadence=0.5 zenoh=7.4 tcpip=3.2 Tmr Svc=0.0
+  xip hit mean=98.5 % acc mean=35779718/s misses mean=536696/s
+  rmw_wait per second: calls=187.5 ready=17.8 zero=0.0 short=0.0 signalled=169.1 timeout=0.0 raced=0.6
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=3000 min=2078 p10=2333 median=2606 mean=2672 p90=2923 max=4265 sd=365 us
+  downlink 1 s averages n=30 min=2476 p10=2542 median=2586 mean=2583 p90=2640 max=2657 sd=40 us
+  downlink max - min per 1 s n=30 min=8298 p10=8360 median=8470 mean=8565 p90=8613 max=11547 sd=561 us
+  before_rmw_us per 1 s: avg mean=1732 min=1328 max=2318
+  before_rmw_us max - min per 1 s n=30 min=489 p10=591 median=687 mean=699 p90=860 max=879 sd=96 us
+  in_executor_us per 1 s: avg mean=847 min=516 max=8958
+  in_executor_us max - min per 1 s n=30 min=1189 p10=8144 median=8271 mean=8039 p90=8416 max=8435 sd=1275 us
+  split ambiguous per second: mean=0.1
+  downlink + uplink mean=5255 us
+  downlink + uplink per stats period n=30 min=4929 p10=5135 median=5273 mean=5255 p90=5370 max=5426 sd=98 us
+[joint_ping]
+  idle mean=68.0 % min=68 max=68
+  cpu mean %: app=17.9 IDLE=68.2 usb=1.8 cadence=0.5 zenoh=7.7 tcpip=3.5 Tmr Svc=0.0
+  xip hit mean=98.5 % acc mean=35551532/s misses mean=534964/s
+  rmw_wait per second: calls=186.7 ready=16.6 zero=0.0 short=0.0 signalled=169.3 timeout=0.0 raced=0.8
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=2100 min=2142 p10=2380 median=2594 mean=2671 p90=2865 max=4368 sd=373 us
+  downlink 1 s averages n=21 min=2463 p10=2556 median=2587 mean=2587 p90=2632 max=2639 sd=38 us
+  downlink max - min per 1 s n=21 min=8416 p10=8449 median=8495 mean=9006 p90=11158 max=11394 sd=1058 us
+  before_rmw_us per 1 s: avg mean=1694 min=1377 max=2421
+  before_rmw_us max - min per 1 s n=21 min=505 p10=621 median=705 mean=714 p90=824 max=989 sd=103 us
+  in_executor_us per 1 s: avg mean=870 min=514 max=9051
+  in_executor_us max - min per 1 s n=21 min=1245 p10=1476 median=8216 mean=6959 p90=8356 max=8518 sd=2686 us
+  split ambiguous per second: mean=0.4
+  downlink + uplink mean=5258 us
+  downlink + uplink per stats period n=21 min=4952 p10=5196 median=5272 mean=5257 p90=5346 max=5362 sd=84 us
+  ping loss=0 % min=0.617 avg=1.020 max=2.559 mdev=0.435 ms

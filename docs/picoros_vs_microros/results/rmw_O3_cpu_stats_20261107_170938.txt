@@ -1,0 +1,24 @@
+rmw_O3_cpu_stats 2026-11-07T17:09:38
+[no_joint]
+  idle mean=65.2 % min=65 max=68
+  cpu mean %: app=27.7 IDLE=65.5 usb=2.7 zenoh=0.1 tcpip=3.8 Tmr Svc=0.0
+  xip hit mean=98.3 % acc mean=36511091/s misses mean=633779/s
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=5230 p10=5634 median=6461 mean=6442 p90=7201 max=8094 sd=575 us
+[joint]
+  idle mean=39.2 % min=38 max=40
+  cpu mean %: app=38.0 IDLE=39.6 usb=3.8 zenoh=13.3 tcpip=5.0 Tmr Svc=0.0
+  xip hit mean=95.7 % acc mean=26095743/s misses mean=1118987/s
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=3001 min=3330 p10=3921 median=4789 mean=4733 p90=5549 max=7899 sd=646 us
+  downlink 1 s averages n=30 min=2174 p10=2210 median=2640 mean=2604 p90=2972 max=3436 sd=319 us
+  downlink + uplink mean=7337 us
+[joint_ping]
+  idle mean=38.8 % min=38 max=39
+  cpu mean %: app=38.8 IDLE=39.2 usb=3.5 zenoh=13.4 tcpip=4.9 Tmr Svc=0.0
+  xip hit mean=95.6 % acc mean=25657093/s misses mean=1139875/s
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=2100 min=2687 p10=2965 median=3140 mean=3174 p90=3406 max=5807 sd=241 us
+  downlink 1 s averages n=21 min=3049 p10=3207 median=3396 mean=3354 p90=3431 max=3454 sd=105 us
+  downlink + uplink mean=6529 us
+  ping loss=0 % min=0.895 avg=1.263 max=3.433 mdev=0.487 ms

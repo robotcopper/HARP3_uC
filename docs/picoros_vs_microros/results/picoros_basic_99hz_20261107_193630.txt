@@ -1,0 +1,22 @@
+picoros_basic_99hz 2026-11-07T19:36:30 JointState at 99 Hz
+[no_joint]
+  idle mean=86.8 % min=86 max=87
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=3255 p10=3554 median=3718 mean=3722 p90=3901 max=4186 sd=135 us
+[joint]
+  idle mean=70.5 % min=70 max=71
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=3000 min=3467 p10=3840 median=4074 mean=4164 p90=4378 max=6401 sd=440 us
+  downlink 1 s averages n=30 min=350 p10=401 median=637 mean=555 p90=691 max=710 sd=131 us
+  downlink max - min per 1 s n=30 min=737 p10=785 median=897 mean=901 p90=1029 max=1063 sd=89 us
+  downlink + uplink mean=4719 us
+  downlink + uplink per stats period n=30 min=4587 p10=4613 median=4721 mean=4719 p90=4833 max=4840 sd=70 us
+[joint_ping]
+  idle mean=70.0 % min=70 max=70
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=2100 min=3206 p10=3444 median=3725 mean=3846 p90=4252 max=6519 sd=473 us
+  downlink 1 s averages n=21 min=660 p10=691 median=946 mean=874 p90=979 max=997 sd=125 us
+  downlink max - min per 1 s n=21 min=700 p10=767 median=923 mean=908 p90=974 max=1052 sd=90 us
+  downlink + uplink mean=4721 us
+  downlink + uplink per stats period n=21 min=4547 p10=4644 median=4717 mean=4721 p90=4855 max=4870 sd=81 us
+  ping loss=0 % min=0.768 avg=1.268 max=3.062 mdev=0.547 ms

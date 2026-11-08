@@ -1,0 +1,6 @@
+host_ref_service_peer 2026-11-07T23:07:38 service round trip and late joining, host reference mode=peer
+[late_join] host_ref/boot: received 5/5
+  delay from subscription to message ms: 2.1 1.0 1.1 1.1 1.1
+  message: host reference
+[idle]
+  round trip n=1000 min=603 p10=820 median=992 mean=1000 p90=1188 max=2072 sd=146 us lost=0

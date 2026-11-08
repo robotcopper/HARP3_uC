@@ -1,0 +1,26 @@
+rmw_O3_no_entry_trace 2026-11-07T17:15:54
+[no_joint]
+  idle mean=67.2 % min=67 max=70
+  cpu mean %: app=25.8 IDLE=67.5 usb=2.7 tcpip=3.5 zenoh=0.2 Tmr Svc=0.0
+  xip hit mean=98.2 % acc mean=36484279/s misses mean=646668/s
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=3222 p10=3527 median=3710 mean=3708 p90=3876 max=4564 sd=146 us
+[joint]
+  idle mean=42.5 % min=42 max=43
+  cpu mean %: app=36.7 IDLE=42.8 usb=3.7 tcpip=4.7 zenoh=11.8 Tmr Svc=0.0
+  xip hit mean=95.7 % acc mean=26118439/s misses mean=1118658/s
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=3000 min=3598 p10=3807 median=4125 mean=4342 p90=4950 max=7238 sd=502 us
+  downlink 1 s averages n=30 min=1794 p10=1805 median=2494 mean=2212 p90=2522 max=2530 sd=338 us
+  downlink + uplink mean=6555 us
+  downlink + uplink per stats period n=30 min=6337 p10=6405 median=6540 mean=6555 p90=6719 max=6731 sd=121 us
+[joint_ping]
+  idle mean=41.8 % min=41 max=42
+  cpu mean %: app=36.8 IDLE=42.1 usb=3.8 tcpip=4.9 zenoh=12.1 Tmr Svc=0.0
+  xip hit mean=95.6 % acc mean=25835399/s misses mean=1131793/s
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=2101 min=4215 p10=4399 median=4542 mean=4561 p90=4698 max=7063 sd=204 us
+  downlink 1 s averages n=21 min=2006 p10=2020 median=2049 mean=2057 p90=2104 max=2140 sd=36 us
+  downlink + uplink mean=6618 us
+  downlink + uplink per stats period n=21 min=6550 p10=6564 median=6603 mean=6617 p90=6678 max=6740 sd=49 us
+  ping loss=0 % min=0.903 avg=1.258 max=3.226 mdev=0.501 ms

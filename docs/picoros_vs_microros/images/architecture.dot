@@ -1,0 +1,61 @@
+// The host, the USB link and the two firmwares compared, layer by layer.
+digraph architecture {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", fontsize=13, nodesep=0.3, ranksep=0.4, newrank=true, pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#7a7a7a", fillcolor="#f2f2f2", margin="0.15,0.07"];
+  edge [color="#555555", arrowsize=0.7, dir=both];
+
+  subgraph cluster_host {
+    label="Host PC: Ubuntu 26.04, ROS 2 Lyrical";
+    labeljust=l; style="rounded"; color="#4762a6"; fontcolor="#4762a6"; penwidth=1.5;
+    ros_nodes [label="ROS 2 nodes, ros2 CLI,\nmeasurement scripts\nrmw_zenoh_cpp", fillcolor="#e8edf8", color="#4762a6"];
+    zenohd [label="rmw_zenohd\nZenoh router, tcp/7447", fillcolor="#e8edf8", color="#4762a6"];
+    chrony [label="chrony\nNTP server, udp/123"];
+    picotool [label="picotool\nflashing"];
+    cdc_ncm [label="Linux cdc_ncm driver\n192.168.7.2/24"];
+    ros_nodes -> zenohd;
+    zenohd -> cdc_ncm;
+    chrony -> cdc_ncm;
+  }
+
+  usb [label="one USB cable\nCDC-NCM, Ethernet over USB,\nand picotool's reset interface", style="filled", fillcolor="white", color="#333333"];
+  cdc_ncm -> usb;
+  picotool -> usb;
+
+  subgraph cluster_board {
+    label="Raspberry Pi Pico: RP2040, Cortex-M0+, 264 KB of RAM, 2 MB of flash";
+    labeljust=l; style="rounded"; color="#c41f4c"; fontcolor="#c41f4c"; penwidth=1.5;
+
+    subgraph cluster_platform {
+      label="picoros-usb-eth rp2040 platform, FreeRTOS: the same in both firmwares";
+      labeljust=l; style="rounded,dashed"; color="#888888"; fontcolor="#555555";
+      tinyusb [label="TinyUSB\nCDC-NCM device, reset interface"];
+      lwip [label="lwIP, 192.168.7.1\nDHCP server, TCP, SNTP client"];
+      net_time [label="net_time\nwall clock = hardware timer + SNTP offset,\ncopied to settimeofday()"];
+      tinyusb -> lwip;
+      lwip -> net_time [dir=forward, style=dashed];
+    }
+
+    subgraph cluster_picoros {
+      label="Pico-ROS firmware"; labeljust=l; style="rounded"; color="#e08a1e"; fontcolor="#b36200";
+      zp18 [label="zenoh-pico 1.8.0, fork\nclient session", fillcolor="#fdebd3", color="#e08a1e"];
+      picoros [label="Pico-ROS, fork\nMicro-CDR", fillcolor="#fdebd3", color="#e08a1e"];
+      app_p [label="application\ncallbacks in the zenoh task", fillcolor="#fdebd3", color="#e08a1e"];
+      zp18 -> picoros -> app_p;
+    }
+
+    subgraph cluster_microros {
+      label="micro-ROS firmware"; labeljust=l; style="rounded"; color="#47c7ef"; fontcolor="#1c8fb5";
+      zp110 [label="zenoh-pico 1.10.1, fork\nclient session", fillcolor="#e0f5fc", color="#47c7ef"];
+      rmw [label="rmw_zenoh_pico, fork", fillcolor="#e0f5fc", color="#47c7ef"];
+      rcl [label="rcl, rcutils\nrosidl typesupport, Micro-CDR", fillcolor="#e0f5fc", color="#47c7ef"];
+      rclc [label="rclc executor", fillcolor="#e0f5fc", color="#47c7ef"];
+      app_m [label="application\ncallbacks in the executor", fillcolor="#e0f5fc", color="#47c7ef"];
+      zp110 -> rmw -> rcl -> rclc -> app_m;
+    }
+
+    lwip -> zp18;
+    lwip -> zp110;
+  }
+
+  usb -> tinyusb;
+}

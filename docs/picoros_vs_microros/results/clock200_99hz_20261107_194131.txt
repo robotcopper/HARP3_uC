@@ -1,0 +1,44 @@
+clock200_99hz 2026-11-07T19:41:31 JointState at 99 Hz, board clock 200 MHz
+[no_joint]
+  idle mean=90.0 % min=90 max=90
+  cpu mean %: app=7.3 IDLE=90.6 usb=0.6 cadence=0.4 zenoh=0.0 tcpip=0.8 Tmr Svc=0.0
+  xip hit mean=99.6 % acc mean=73168354/s misses mean=292673/s
+  rmw_wait per second: calls=100.0 ready=0.0 zero=0.0 short=0.0 signalled=100.0 timeout=0.0 raced=0.0
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=2656 p10=2916 median=3055 mean=3055 p90=3194 max=3530 sd=108 us
+  split ambiguous per second: mean=0.0
+[joint]
+  idle mean=80.0 % min=80 max=80
+  cpu mean %: app=11.4 IDLE=80.4 usb=1.1 cadence=0.3 zenoh=4.5 tcpip=2.0 Tmr Svc=0.0
+  xip hit mean=99.1 % acc mean=65609100/s misses mean=590482/s
+  rmw_wait per second: calls=191.6 ready=10.7 zero=0.0 short=0.0 signalled=180.7 timeout=0.0 raced=0.3
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=3000 min=2784 p10=3143 median=3315 mean=3349 p90=3572 max=4828 sd=204 us
+  downlink 1 s averages n=30 min=600 p10=633 median=658 mean=657 p90=702 max=725 sd=29 us
+  downlink max - min per 1 s n=30 min=898 p10=974 median=1089 mean=1094 p90=1197 max=1421 sd=103 us
+  before_rmw_us per 1 s: avg mean=216 min=-100 max=1368
+  before_rmw_us max - min per 1 s n=30 min=475 p10=497 median=571 mean=603 p90=653 max=1423 sd=165 us
+  in_executor_us per 1 s: avg mean=440 min=328 max=1160
+  in_executor_us max - min per 1 s n=30 min=729 p10=731 median=741 mean=749 p90=774 max=831 sd=21 us
+  split ambiguous per second: mean=0.0
+  subscription lookup per sample: mean=82.1 us max=165 us, samples per second mean=99.0
+  downlink + uplink mean=4005 us
+  downlink + uplink per stats period n=30 min=3910 p10=3928 median=4001 mean=4005 p90=4071 max=4129 sd=53 us
+[joint_ping]
+  idle mean=80.0 % min=80 max=80
+  cpu mean %: app=11.4 IDLE=80.2 usb=1.1 cadence=0.3 zenoh=4.5 tcpip=2.1 Tmr Svc=0.0
+  xip hit mean=99.1 % acc mean=65511723/s misses mean=589606/s
+  rmw_wait per second: calls=192.2 ready=10.8 zero=0.0 short=0.0 signalled=180.9 timeout=0.0 raced=0.6
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=2100 min=2927 p10=3212 median=3374 mean=3395 p90=3579 max=4460 sd=180 us
+  downlink 1 s averages n=21 min=600 p10=608 median=632 mean=638 p90=677 max=715 sd=29 us
+  downlink max - min per 1 s n=21 min=917 p10=1005 median=1078 mean=1086 p90=1182 max=1274 sd=84 us
+  before_rmw_us per 1 s: avg mean=202 min=-147 max=663
+  before_rmw_us max - min per 1 s n=21 min=449 p10=479 median=565 mean=568 p90=662 max=685 sd=68 us
+  in_executor_us per 1 s: avg mean=435 min=329 max=1146
+  in_executor_us max - min per 1 s n=21 min=731 p10=734 median=745 mean=756 p90=789 max=813 sd=22 us
+  split ambiguous per second: mean=0.0
+  subscription lookup per sample: mean=82.2 us max=168 us, samples per second mean=99.0
+  downlink + uplink mean=4033 us
+  downlink + uplink per stats period n=21 min=3932 p10=3976 median=4018 mean=4033 p90=4100 max=4142 sd=55 us
+  ping loss=0 % min=0.582 avg=0.759 max=1.742 mdev=0.196 ms

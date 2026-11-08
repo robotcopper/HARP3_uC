@@ -1,0 +1,18 @@
+host_ref_client 2026-11-07T19:08:41 host reference mode=client JointState at 99 Hz
+[no_joint]
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=264 p10=468 median=570 mean=578 p90=699 max=945 sd=92 us
+  split ambiguous per second: mean=0.0
+[joint]
+  joint received per second: mean=99.0 min=99 max=99
+  uplink n=3000 min=276 p10=468 median=568 mean=572 p90=681 max=1831 sd=86 us
+  downlink 1 s averages n=30 min=747 p10=769 median=828 mean=819 p90=855 max=880 sd=33 us
+  downlink max - min per 1 s n=30 min=428 p10=501 median=602 mean=630 p90=807 max=963 sd=123 us
+  before_rmw_us per 1 s: avg mean=558 min=163 max=1003
+  before_rmw_us max - min per 1 s n=30 min=343 p10=407 median=471 mean=473 p90=549 max=585 sd=56 us
+  in_executor_us per 1 s: avg mean=261 min=104 max=854
+  in_executor_us max - min per 1 s n=30 min=217 p10=264 median=330 mean=369 p90=547 max=706 sd=114 us
+  split ambiguous per second: mean=0.0
+  downlink + uplink mean=1391 us
+  downlink + uplink per stats period n=30 min=1278 p10=1336 median=1390 mean=1391 p90=1449 max=1481 sd=44 us
+  before_rmw + uplink mean=1130 us

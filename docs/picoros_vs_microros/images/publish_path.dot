@@ -1,0 +1,30 @@
+// The odometry, from the 10 ms cadence to the USB link, task by task.
+digraph publish_path {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", fontsize=13, nodesep=0.4, ranksep=0.35, newrank=true, pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#7a7a7a", fillcolor="#eeeeee", margin="0.15,0.07"];
+  edge [color="#555555", arrowsize=0.7, fontname="Helvetica", fontsize=10];
+
+  subgraph cluster_picoros {
+    label="Pico-ROS"; labeljust=l; style="rounded"; color="#e08a1e"; fontcolor="#b36200";
+    p_tick [label="app task, priority 2\nvTaskDelayUntil(), every 10 ms", fillcolor="#dae8fc", color="#6c8ebf"];
+    p_ser [label="picoros_publish(): serialise with Micro-CDR\ninto the application's buffer;\nattachment: sequence, wall-clock time, GID", fillcolor="#dae8fc", color="#6c8ebf"];
+    p_put [label="zenoh-pico 1.8.0 z_publisher_put():\nencode, write to the socket, Nagle on", fillcolor="#dae8fc", color="#6c8ebf"];
+    p_tick -> p_ser -> p_put;
+  }
+
+  subgraph cluster_microros {
+    label="micro-ROS"; labeljust=l; style="rounded"; color="#47c7ef"; fontcolor="#1c8fb5";
+    m_tick [label="cadence task, priority 3\nvTaskDelayUntil(), every 10 ms:\nrcl_trigger_guard_condition()", fillcolor="#d5e8d4", color="#82b366"];
+    m_wake [label="app task, priority 2\nrmw_wait() returns, the rclc executor\ncalls the guard condition's callback", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_ser [label="rcl_publish(), rmw_publish(): serialise with\nMicro-CDR into a heap buffer;\nattachment: sequence, wall-clock time, GID", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_put [label="zenoh-pico 1.10.1 z_publisher_put():\nencode, write to the socket, TCP_NODELAY", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_tick -> m_wake [label=" condition variable"];
+    m_wake -> m_ser -> m_put;
+  }
+
+  tcpip [label="tcpip task, priority 20\nlwIP: TCP segment, IP"];
+  usb [label="usb task, priority 22\nTinyUSB: one Ethernet frame per NCM transfer"];
+  p_put -> tcpip [label=" socket"];
+  m_put -> tcpip [label=" socket"];
+  tcpip -> usb;
+}

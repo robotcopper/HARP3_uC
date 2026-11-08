@@ -1,0 +1,36 @@
+// A JointState from the host to the user callback, task by task.
+digraph receive_path {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", fontsize=13, nodesep=0.4, ranksep=0.35, newrank=true, pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#7a7a7a", fillcolor="#eeeeee", margin="0.15,0.07"];
+  edge [color="#555555", arrowsize=0.7, fontname="Helvetica", fontsize=10];
+
+  usb [label="usb task, priority 22\nTinyUSB: one NCM transfer, one Ethernet frame"];
+  tcpip [label="tcpip task, priority 20\nlwIP: IP, TCP, socket receive buffer"];
+  usb -> tcpip;
+
+  subgraph cluster_picoros {
+    label="Pico-ROS"; labeljust=l; style="rounded"; color="#e08a1e"; fontcolor="#b36200";
+    p_read [label="zenoh read task, priority 16\nread a batch, decode each frame", fillcolor="#fff2cc", color="#d6b656"];
+    p_lookup [label="find the matching subscriptions", fillcolor="#fff2cc", color="#d6b656"];
+    p_cb [label="Pico-ROS handler, then the user callback,\nwhich deserialises the payload in place", fillcolor="#fff2cc", color="#d6b656"];
+    p_read -> p_lookup -> p_cb;
+  }
+
+  subgraph cluster_microros {
+    label="micro-ROS"; labeljust=l; style="rounded"; color="#47c7ef"; fontcolor="#1c8fb5";
+    m_read [label="zenoh task, priority 16\nread a batch, decode each frame", fillcolor="#fff2cc", color="#d6b656"];
+    m_lookup [label="find the matching subscriptions, RX cache:\n66 µs mean at 200 MHz", fillcolor="#fff2cc", color="#d6b656"];
+    m_handler [label="rmw_zenoh_pico handler: copy the payload\ninto the heap, queue it, signal the wait set", fillcolor="#fff2cc", color="#d6b656"];
+    m_wait [label="app task, priority 2\nrmw_wait() returns to the rclc executor", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_take [label="rcl_take(), rmw_take():\ndeserialise with Micro-CDR, free the copy", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_cb [label="user callback", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_read -> m_lookup;
+    m_lookup -> m_handler;
+    m_handler -> m_wait [label=" condition variable"];
+    m_wait -> m_take;
+    m_take -> m_cb [label=" handler to callback:\n 0.47 ms mean at 200 MHz"];
+  }
+
+  tcpip -> p_read [label=" socket"];
+  tcpip -> m_read [label=" socket"];
+}

@@ -1,0 +1,27 @@
+hot_ram 2026-11-07T17:39:39
+[no_joint]
+  idle mean=73.5 % min=73 max=79
+  cpu mean %: app=22.5 IDLE=73.9 usb=1.4 zenoh=0.0 tcpip=2.0 Tmr Svc=0.0
+  xip hit mean=99.3 % acc mean=39214192/s misses mean=270393/s
+  joint received per second: mean=0.0 min=0 max=0
+  uplink n=3000 min=1945 p10=2158 median=2396 mean=2385 p90=2590 max=2982 sd=163 us
+[joint]
+  idle mean=59.8 % min=59 max=61
+  cpu mean %: app=27.6 IDLE=60.2 usb=1.6 tcpip=3.0 zenoh=7.3 Tmr Svc=0.0
+  xip hit mean=98.4 % acc mean=32734119/s misses mean=524830/s
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=3000 min=2088 p10=2315 median=2436 mean=2438 p90=2564 max=3388 sd=99 us
+  downlink 1 s averages n=30 min=2091 p10=2138 median=2178 mean=2174 p90=2224 max=2234 sd=32 us
+  downlink + uplink mean=4612 us
+  downlink + uplink per stats period n=30 min=4492 p10=4541 median=4601 mean=4612 p90=4690 max=4703 sd=53 us
+[joint_ping]
+  idle mean=59.9 % min=59 max=63
+  cpu mean %: app=27.3 IDLE=60.4 usb=1.6 tcpip=3.1 zenoh=7.3 Tmr Svc=0.0
+  xip hit mean=98.4 % acc mean=32902488/s misses mean=529530/s
+  joint received per second: mean=100.0 min=100 max=100
+  uplink n=2101 min=2066 p10=2260 median=2390 mean=2390 p90=2523 max=2833 sd=104 us
+  downlink 1 s averages n=21 min=2095 p10=2120 median=2173 mean=2183 p90=2231 max=2303 sd=49 us
+  downlink + uplink mean=4573 us
+  downlink + uplink per stats period n=21 min=4390 p10=4455 median=4583 mean=4572 p90=4677 max=4760 sd=92 us
+  ping loss=0 % min=0.605 avg=0.848 max=3.824 mdev=0.414 ms
+profile of phase joint: /home/floris/microros_rp2040_spike/tools/results/hot_ram_20261107_173939_profile.txt

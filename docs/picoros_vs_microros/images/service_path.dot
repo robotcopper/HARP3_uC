@@ -1,0 +1,33 @@
+// A service request, from the host's query to the reply, task by task.
+digraph service_path {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", fontsize=13, nodesep=0.4, ranksep=0.35, newrank=true, pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#7a7a7a", fillcolor="#eeeeee", margin="0.15,0.07"];
+  edge [color="#555555", arrowsize=0.7, fontname="Helvetica", fontsize=10];
+
+  rx [label="usb and tcpip tasks\nthe request arrives as a Zenoh query"];
+
+  subgraph cluster_picoros {
+    label="Pico-ROS"; labeljust=l; style="rounded"; color="#e08a1e"; fontcolor="#b36200";
+    p_query [label="zenoh read task, priority 16\nqueryable callback", fillcolor="#fff2cc", color="#d6b656"];
+    p_cb [label="Pico-ROS service handler, then the user\ncallback, which returns the serialised reply", fillcolor="#fff2cc", color="#d6b656"];
+    p_reply [label="z_query_reply(), then the final reply\nwhen the query is dropped", fillcolor="#fff2cc", color="#d6b656"];
+    p_query -> p_cb -> p_reply;
+  }
+
+  subgraph cluster_microros {
+    label="micro-ROS"; labeljust=l; style="rounded"; color="#47c7ef"; fontcolor="#1c8fb5";
+    m_query [label="zenoh task, priority 16\nqueryable callback", fillcolor="#fff2cc", color="#d6b656"];
+    m_queue [label="rmw_zenoh_pico: keep a reference to the\nquery, copy the payload, queue the request,\nsignal the wait set", fillcolor="#fff2cc", color="#d6b656"];
+    m_take [label="app task, priority 2\nrclc executor: rcl_take_request(),\ndeserialise, user callback", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_send [label="rcl_send_response(), rmw_send_response():\nserialise into a heap buffer, z_query_reply(),\ndrop the query: final reply", fillcolor="#dae8fc", color="#6c8ebf"];
+    m_query -> m_queue;
+    m_queue -> m_take [label=" condition variable;\n waits for the callback\n running, if any"];
+    m_take -> m_send;
+  }
+
+  tx [label="tcpip and usb tasks\nthe reply leaves"];
+  rx -> p_query;
+  rx -> m_query;
+  p_reply -> tx;
+  m_send -> tx;
+}
