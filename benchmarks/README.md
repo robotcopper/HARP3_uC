@@ -89,6 +89,7 @@ python3 tools/measure.py <label> --rate 99          # about 1 min 30 s
 python3 tools/service_rtt.py <label>                # about 1 min
 python3 tools/host_reference.py <label> --mode client
 python3 tools/service_rtt.py <label> --host-reference client
+python3 tools/memory_footprint.py <label> <firmware>/build/rp2040/<firmware>.elf
 ```
 
 Each writes `<label>_<date>_<time>.txt` to
@@ -96,10 +97,15 @@ Each writes `<label>_<date>_<time>.txt` to
 Measure with the host otherwise idle: a build running next to it shows in the
 latencies.
 
+`service_rtt.py` reads the heap and the stacks from the board's stats: run it
+on a board just flashed, so that its first reading is the state after boot and
+the lowest marks cover the run alone.
+
 | Script | Does |
 | --- | --- |
 | `measure.py` | idle time, uplink, downlink and their sum, with and without JointState; `--profile` also samples the micro-ROS firmware's program counter |
-| `service_rtt.py` | late joiners on `pico/boot`, then 1000 calls of `pico/ping` |
+| `service_rtt.py` | late joiners on `pico/boot`, then 1000 calls of `pico/ping`, idle and with JointState; the heap and the stacks before and after |
+| `memory_footprint.py` | flash, static RAM, FreeRTOS heap and `malloc()` region of a firmware, from its ELF |
 | `host_reference.py` | the exchange of `measure.py` between two processes on the host, peer or client |
 | `stamp_gap.py` | the gap between `header.stamp` and the rmw attachment's timestamp |
 | `profile_report.py` | a saved profile mapped to functions and components of the ELF |

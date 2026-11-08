@@ -16,6 +16,11 @@ future is done, on the host clock alone: no clock offset enters it. As in
 measure.py, the odometry and stats are subscribed to; phase joint adds
 JointState at 99 Hz.
 
+The FreeRTOS heap free and its lowest ever, and from the micro-ROS firmware
+the unused stack of each task, are read from pico/stats at the start and after
+each phase: run on a board just flashed, the start is the state after boot and
+the end the low marks of the whole run.
+
 With --host-reference peer|client, the same runs against a stand-in for the
 board started on the host, which serves host_ref/ping and publishes
 host_ref/boot, to tell the share of the host and of the router; the modes are
@@ -40,7 +45,7 @@ from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 
-from measure import RESULTS, SETTLE_S, Measure, Phase, describe, report
+from measure import RESULTS, SETTLE_S, Measure, Phase, describe, memory_line, report
 
 CLIENT_OVERRIDE = 'mode="client"'
 JOINT_RATE_HZ = 99.0
@@ -170,7 +175,9 @@ def run_board_measure(args):
         return 1
 
     started = datetime.now()
+    memory = [("start", measure.next_memory())]
     delays, text = late_join(node, "pico/boot", args.attempts)
+    memory.append(("after late_join", measure.next_memory()))
     results = []
     for phase, publishing in ((Phase("idle"), False), (Phase("joint"), True)):
         measure.publishing = publishing
@@ -178,6 +185,7 @@ def run_board_measure(args):
         measure.current = phase
         results.append((phase, round_trips(node, client, args.calls)))
         measure.current = None
+        memory.append((f"after {phase.name}", measure.next_memory()))
     measure.publishing = False
     node.destroy_node()
     rclpy.shutdown()
@@ -188,6 +196,8 @@ def run_board_measure(args):
     for phase, (rtts_us, lost) in results:
         lines += report(phase)
         lines += round_trip_lines(rtts_us, lost)
+    lines.append("[memory] bytes, from the first stats after each step")
+    lines += [memory_line(when, values) for when, values in memory]
     return write(args.label, started, lines)
 
 

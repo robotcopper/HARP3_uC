@@ -79,6 +79,8 @@ class Measure:
         self.current = None
         self.publishing = False
         self.stats_seen = False
+        self.stats_count = 0
+        self.memory = None
         self.clock_mhz = None
         self.profile_lines = []
         self.profile_done = False
@@ -127,10 +129,12 @@ class Measure:
 
     def on_stats(self, msg):
         self.stats_seen = True
+        self.stats_count += 1
         text = msg.data
         match = re.search(r"clk_mhz=(\d+)", text)
         if match:
             self.clock_mhz = int(match.group(1))
+        self.memory = parse_memory(text)
         phase = self.current
         if phase is None:
             return
@@ -178,6 +182,14 @@ class Measure:
         while time.monotonic() < end:
             rclpy.spin_once(self.node, timeout_sec=0.005)
 
+    def next_memory(self, timeout_s=3.0):
+        """The memory of the first stats received after this call, None if none came."""
+        count = self.stats_count
+        end = time.monotonic() + timeout_s
+        while self.stats_count == count and time.monotonic() < end:
+            rclpy.spin_once(self.node, timeout_sec=0.005)
+        return self.memory if self.stats_count != count else None
+
     def run(self, phase, seconds, publishing, ping, profile=False):
         """Records after SETTLE_S, so that the 1 s stats straddling the switch are dropped."""
         self.publishing = publishing
@@ -200,6 +212,37 @@ class Measure:
             output = process.communicate(timeout=10)[0]
             match = re.search(r"(\d+)% packet loss.*?= ([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+) ms", output, re.S)
             phase.ping = match.groups() if match else output.strip()
+
+
+def parse_memory(text):
+    """In bytes: the FreeRTOS heap free and its lowest ever, and from the micro-ROS
+    firmware only, newlib's malloc() bytes in use and arena, and the unused stack
+    of each task."""
+    memory = {}
+    match = re.search(r"heap=(\d+) min=(\d+)", text)
+    if match:
+        memory["heap"] = int(match.group(1))
+        memory["heap_min"] = int(match.group(2))
+    match = re.search(r"libc=(\d+)/(\d+)", text)
+    if match:
+        memory["libc_used"] = int(match.group(1))
+        memory["libc_arena"] = int(match.group(2))
+    match = re.search(r"\| stack free (.*?)(?: \||$)", text)
+    if match:
+        memory["stacks"] = {name.strip(): int(free)
+                            for name, free in re.findall(r"([A-Za-z][A-Za-z ]*?)=(\d+)", match.group(1))}
+    return memory
+
+
+def memory_line(when, memory):
+    if not memory:
+        return f"  {when}: no stats"
+    line = f"  {when}: heap free={memory['heap']} min={memory['heap_min']}"
+    if "libc_used" in memory:
+        line += f" | malloc used={memory['libc_used']} arena={memory['libc_arena']}"
+    if "stacks" in memory:
+        line += " | stack free " + " ".join(f"{name}={free}" for name, free in memory["stacks"].items())
+    return line
 
 
 def describe(values, unit):
