@@ -4,3 +4,11 @@
 [submodule "mobile_base_pico/lib/PAA5160E1_Pico_Library"]
 	path = mobile_base_pico/lib/PAA5160E1_Pico_Library
 	url = https://github.com/robotcopper/PAA5160E1_Pico_Library.git
+[submodule "benchmarks/microros_rp2040_basic/lib/zenoh-pico"]
+	path = benchmarks/microros_rp2040_basic/lib/zenoh-pico
+	url = https://github.com/robotcopper/zenoh-pico.git
+	branch = rmw-zenoh-pico-1.10.1
+[submodule "benchmarks/microros_rp2040_basic/lib/rmw_zenoh_pico"]
+	path = benchmarks/microros_rp2040_basic/lib/rmw_zenoh_pico
+	url = https://github.com/robotcopper/rmw_zenoh_pico.git
+	branch = lyrical-rp2040
