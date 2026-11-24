@@ -1,9 +1,12 @@
-# imu_led_pico
+# deck_pico
 
-Firmware of the HARP3 IMU and obstacle ring board: a Raspberry Pi Pico (RP2040)
-that publishes a BNO085 IMU and lights a ring of 57 WS2812B LEDs around the robot in
-a gradient by obstacle distance: carmine at 14 cm, forest green from 60 cm. It
-appears in the ROS 2 graph as the node `/imu_led_pico`, on the same stack as
+Firmware of the HARP3 deck board: a Raspberry Pi Pico (RP2040) on the deck, the
+level above the mobile base, for what is not the base. The mobile base board drives
+the wheels and reads the odometry sensor and the limit switches; this one publishes
+a BNO085 IMU and lights a ring of 57 WS2812B LEDs around the robot in a gradient by
+obstacle distance: carmine at 14 cm, forest green from 60 cm. The servos and pumps
+are to join it. It appears in the ROS 2 graph as the node `/deck_pico`, on the same
+stack as
 [`mobile_base_pico`](../mobile_base_pico/README.md): Pico-ROS on zenoh-pico over
 Ethernet over USB, on the `rp2040` platform of
 [`picoros-usb-eth`](https://github.com/robotcopper/picoros-usb-eth).
@@ -21,7 +24,7 @@ from this directory.
 | --- | --- | --- | --- |
 | `imu/bno085`, published | `sensor_msgs/Imu` | best effort, depth 5 | 100 Hz, frame `imu_link`, in the sensor's own axes |
 | `scan`, subscribed | `sensor_msgs/LaserScan` | best effort, depth 5 | the YDLIDAR driver's topic; drives the ring |
-| `imu_led_pico/status`, published | `std_msgs/String` | best effort, depth 5 | every 5 s, the board's only console; see [Lifecycle](#lifecycle) |
+| `deck_pico/status`, published | `std_msgs/String` | best effort, depth 5 | every 5 s, the board's only console; see [Lifecycle](#lifecycle) |
 
 The board publishes no TF and has no parameters. `imu_link` and its transform to
 `base_link` belong in the robot description once the sensor's mounting is fixed.
@@ -112,7 +115,7 @@ committed, the firmware build needs no Python.
 | --- | --- | --- |
 | BNO085 | I2C0, SDA GP4, SCL GP5, address 0x4A | the pins and address of BNO08x_Pico_Library; no interrupt or reset line |
 | WS2812B data | GP0, physical pin 1 | `BOARD_LED_STRIP_PIN`, PIO0, fed by DMA |
-| Debug output | none | GP0 is UART0's TX, so the UART console is off; `imu_led_pico/status` stands in for it, and USB carries the network link |
+| Debug output | none | GP0 is UART0's TX, so the UART console is off; `deck_pico/status` stands in for it, and USB carries the network link |
 | LED | on-board | blinks fast while waiting for the host, lit while the IMU answers |
 
 **Power the strip from its own 5 V supply, never from the Pico's VBUS.** The ring's
@@ -166,13 +169,13 @@ driver's `intensity: false` halves the message.
 
 ```mermaid
 flowchart TB
-  subgraph fw["imu_led_pico"]
+  subgraph fw["deck_pico"]
     APP["app_main.c<br/>node, entities, 10 ms loop"]
     VIEW["led_view.c<br/>scan to a range per LED, range to a colour, no hardware access"]
     MAP["led_map.h<br/>generated: the angle span of each LED"]
     IMU["imu.cpp<br/>C interface to the sensor"]
     WS["ws2812.c, ws2812.pio<br/>PIO and DMA"]
-    TYPES["imu_led_types.h<br/>generated message types"]
+    TYPES["deck_pico_types.h<br/>generated message types"]
   end
   LIB["lib/BNO08x_Pico_Library"]
   subgraph kit["picoros-usb-eth"]
@@ -216,7 +219,7 @@ The application task runs below zenoh-pico's and lwIP's, which hold it for up to
 transfer timeout is raised to 50 ms so that such a pause does not cut a transfer
 short and leave the sensor out of step.
 
-Every 5 s the board publishes on `imu_led_pico/status` one line: how it started, the sensor's state and, when it is not open, why and which
+Every 5 s the board publishes on `deck_pico/status` one line: how it started, the sensor's state and, when it is not open, why and which
 addresses answer on its bus with the level of SDA and SCL; how many reports came
 from the sensor and how many messages went out; the SNTP state; the scans taken and
 rejected, and the longest scan callback; the frames sent to the strip, the level
@@ -235,10 +238,10 @@ off and change `LED_COUNT`.
 source /opt/ros/lyrical/setup.bash
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 ip -br addr | grep enx            # the board's interface, holding 192.168.8.2
-ros2 node list                    # /imu_led_pico
+ros2 node list                    # /deck_pico
 ros2 topic hz /imu/bno085         # about 100 Hz
 ros2 topic echo /imu/bno085 --once
-ros2 topic echo /imu_led_pico/status --qos-reliability best_effort --full-length
+ros2 topic echo /deck_pico/status --qos-reliability best_effort --full-length
 ```
 
 Flat on a table, `linear_acceleration.z` is about 9.8 and the quaternion is near
@@ -277,11 +280,11 @@ message encoding were also checked against `rclpy`'s own serialisation of a
 | `src/ws2812.c`, `src/ws2812.pio` | the strip on PIO0 and DMA |
 | `include/board.h` | pins and brightness |
 | `include/led_map.h` | the angle span of each LED, generated |
-| `include/imu_led_types.h` | message types and their hashes, generated |
+| `include/deck_pico_types.h` | message types and their hashes, generated |
 | `lib/BNO08x_Pico_Library` | submodule, the BNO08x driver |
 | `test/` | host unit tests: `test/run.sh` |
 | `tools/gen_led_map.py` | regenerates `led_map.h` |
-| `tools/gen_types.sh` | regenerates `imu_led_types.h` |
+| `tools/gen_types.sh` | regenerates `deck_pico_types.h` |
 | `tools/fake_scan.py` | a synthetic scan, to try the ring without a lidar |
 
 ## Message types

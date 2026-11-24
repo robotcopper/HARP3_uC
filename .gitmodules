@@ -12,6 +12,6 @@
 	path = benchmarks/microros_rp2040_basic/lib/rmw_zenoh_pico
 	url = https://github.com/robotcopper/rmw_zenoh_pico.git
 	branch = lyrical-rp2040
-[submodule "imu_led_pico/lib/BNO08x_Pico_Library"]
-	path = imu_led_pico/lib/BNO08x_Pico_Library
+[submodule "deck_pico/lib/BNO08x_Pico_Library"]
+	path = deck_pico/lib/BNO08x_Pico_Library
 	url = https://github.com/robotcopper/BNO08x_Pico_Library.git

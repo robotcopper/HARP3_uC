@@ -3,8 +3,8 @@
  * one task owns the sensor.
  */
 
-#ifndef IMU_LED_IMU_H
-#define IMU_LED_IMU_H
+#ifndef DECK_PICO_IMU_H
+#define DECK_PICO_IMU_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -60,4 +60,4 @@ const char *imu_diagnosis(void);
 }
 #endif
 
-#endif /* IMU_LED_IMU_H */
+#endif /* DECK_PICO_IMU_H */

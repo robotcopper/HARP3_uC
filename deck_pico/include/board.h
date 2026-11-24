@@ -1,11 +1,11 @@
 /*
- * Pin assignment and tuning of the HARP3 IMU and obstacle ring board. The IMU
+ * Pin assignment and tuning of the HARP3 deck board. The IMU
  * bus is the one BNO08x_Pico_Library uses: I2C0, SDA GP4, SCL GP5, address
  * 0x4A, in its utils.h.
  */
 
-#ifndef IMU_LED_BOARD_H
-#define IMU_LED_BOARD_H
+#ifndef DECK_PICO_BOARD_H
+#define DECK_PICO_BOARD_H
 
 /* WS2812B data in, physical pin 1. GP0 is UART0's TX, so this firmware has no
    UART console; see CMakeLists.txt. */
@@ -35,4 +35,4 @@
    under 0.3 A at 160. */
 #define BOARD_LED_BRIGHTNESS 160
 
-#endif /* IMU_LED_BOARD_H */
+#endif /* DECK_PICO_BOARD_H */

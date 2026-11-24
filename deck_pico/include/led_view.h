@@ -3,8 +3,8 @@
  * tested on the host: LaserScan beams to a range per LED, and a range to a colour.
  */
 
-#ifndef IMU_LED_LED_VIEW_H
-#define IMU_LED_LED_VIEW_H
+#ifndef DECK_PICO_LED_VIEW_H
+#define DECK_PICO_LED_VIEW_H
 
 #include <math.h>
 #include <stdbool.h>
@@ -72,4 +72,4 @@ void led_view_render(led_rgb_t *out, const float *led_range, led_view_mode_t mod
 }
 #endif
 
-#endif /* IMU_LED_LED_VIEW_H */
+#endif /* DECK_PICO_LED_VIEW_H */

@@ -149,8 +149,8 @@ def render():
         " * The spans tile the full circle: each direction belongs to exactly one LED.",
         " */",
         "",
-        "#ifndef IMU_LED_LED_MAP_H",
-        "#define IMU_LED_LED_MAP_H",
+        "#ifndef DECK_PICO_LED_MAP_H",
+        "#define DECK_PICO_LED_MAP_H",
         "",
         f"#define LED_COUNT {LED_COUNT}",
         "",
@@ -167,7 +167,7 @@ def render():
     for i, (start, width, radius) in enumerate(table):
         lines.append(f"    {{{start:.6f}f, {width:.6f}f, {radius:.4f}f}}, /* {i:2d}: {math.degrees(start):8.2f} deg, "
                      f"{math.degrees(width):5.2f} deg wide */")
-    lines += ["};", "", "#endif /* IMU_LED_LED_MAP_H */", ""]
+    lines += ["};", "", "#endif /* DECK_PICO_LED_MAP_H */", ""]
     return "\n".join(lines)
 
 

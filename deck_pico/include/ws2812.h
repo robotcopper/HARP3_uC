@@ -3,8 +3,8 @@
  * CPU a copy of LED_COUNT words, not the 9 ms the strip takes to shift it in.
  */
 
-#ifndef IMU_LED_WS2812_H
-#define IMU_LED_WS2812_H
+#ifndef DECK_PICO_WS2812_H
+#define DECK_PICO_WS2812_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -39,4 +39,4 @@ uint32_t ws2812_count_edges(void);
 }
 #endif
 
-#endif /* IMU_LED_WS2812_H */
+#endif /* DECK_PICO_WS2812_H */

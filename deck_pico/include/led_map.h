@@ -7,8 +7,8 @@
  * The spans tile the full circle: each direction belongs to exactly one LED.
  */
 
-#ifndef IMU_LED_LED_MAP_H
-#define IMU_LED_LED_MAP_H
+#ifndef DECK_PICO_LED_MAP_H
+#define DECK_PICO_LED_MAP_H
 
 #define LED_COUNT 57
 
@@ -80,4 +80,4 @@ static const led_sector_t LED_SECTORS[LED_COUNT] = {
     {-1.265784f, 0.218550f, 0.0656f}, /* 56:   -72.52 deg, 12.52 deg wide */
 };
 
-#endif /* IMU_LED_LED_MAP_H */
+#endif /* DECK_PICO_LED_MAP_H */

@@ -1,5 +1,5 @@
 /*
- * HARP3 IMU and obstacle ring node, on Pico-ROS over Ethernet over USB and TCP to
+ * HARP3 deck board node, the IMU and the obstacle ring, on Pico-ROS over Ethernet over USB and TCP to
  * rmw_zenohd. The same stack as mobile_base_pico.
  *
  *   imu/bno085   sensor_msgs/Imu, 100 Hz, best effort, stamped with the host clock
@@ -8,7 +8,7 @@
  *                ring shows the nearest obstacle in the directions it faces, from
  *                the lidar: carmine at IGNORE_RANGE_M, under which beams are
  *                ignored, to forest green from FAR_RANGE_M.
- *   imu_led_pico/status
+ *   deck_pico/status
  *                std_msgs/String every 5 s, best effort. The board's only
  *                console: the strip takes GP0, UART0's TX.
  *
@@ -25,7 +25,7 @@
 #include "board.h"
 #include "hardware/watchdog.h"
 #include "imu.h"
-#include "imu_led_types.h"
+#include "deck_pico_types.h"
 #include "led_view.h"
 #include "pico/stdlib.h"
 #include "picoros.h"
@@ -72,7 +72,7 @@ static const lidar_source_t lidar_sources[] = {
 static void scan_cb(uint8_t *rx, size_t size, const picoros_sample_info_t *info, void *user_data);
 
 static picoros_node_t node = {
-    .name = "imu_led_pico",
+    .name = "deck_pico",
 };
 
 static picoros_publisher_t pub_imu = {
@@ -81,7 +81,7 @@ static picoros_publisher_t pub_imu = {
 };
 
 static picoros_publisher_t pub_status = {
-    .topic = {.name = "imu_led_pico/status", .type = ROSTYPE_NAME(ros_String), .rihs_hash = ROSTYPE_HASH(ros_String)},
+    .topic = {.name = "deck_pico/status", .type = ROSTYPE_NAME(ros_String), .rihs_hash = ROSTYPE_HASH(ros_String)},
     .qos = {.reliability = PICOROS_BEST_EFFORT, .depth = 5},
 };
 
