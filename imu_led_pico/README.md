@@ -1,8 +1,8 @@
 # imu_led_pico
 
 Firmware of the HARP3 IMU and obstacle ring board: a Raspberry Pi Pico (RP2040)
-that publishes a BNO085 IMU and lights a ring of 94 WS2812B LEDs around the robot,
-red where the lidar sees something within 20 cm and green where it does not. It
+that publishes a BNO085 IMU and lights a ring of 57 WS2812B LEDs around the robot in
+a gradient by obstacle distance: carmine at 14 cm, forest green from 60 cm. It
 appears in the ROS 2 graph as the node `/imu_led_pico`, on the same stack as
 [`mobile_base_pico`](../mobile_base_pico/README.md): Pico-ROS on zenoh-pico over
 Ethernet over USB, on the `rp2040` platform of
@@ -54,43 +54,53 @@ and cast the stamp's seconds to 16 bits. Both are fixed here.
 
 Each LED shows the nearest obstacle in the directions it faces, seen from the lidar,
 which sits at the centre of `base_link`. A beam counts when it is finite, no nearer
-than the scan's `range_min` and no farther than its `range_max`: the Tmini Plus
-reports 0 for a point it missed, and that must not light red.
+than the scan's `range_min` nor 14 cm (`IGNORE_RANGE_M`) and no farther than its
+`range_max`: the Tmini Plus reports 0 for a point it missed, and that must not light
+red; within 14 cm, the reach of the plate's lobes, the lidar sees the robot itself.
 
 | Ring | Meaning |
 | --- | --- |
-| green | every lidar answered within 0.5 s, and none sees anything within `OBSTACLE_RANGE_M` (0.20 m) of itself |
-| red | one sees an obstacle nearer than that, in this LED's directions |
-| dim amber | session open, but a lidar is silent: nothing is known, so nothing is green |
+| forest green to carmine | every lidar answered within 0.5 s: the nearest obstacle in this LED's directions, carmine (#960018) at `IGNORE_RANGE_M` (0.14 m), olive gold at 0.37 m, forest green (#228B22) from `FAR_RANGE_M` (0.60 m) and with nothing in sight |
+| dim white, steady | session open, but a lidar is silent: nothing is known |
 | blue, breathing | no session with the host yet |
 
-The threshold is measured from the lidar, not from the edge of the robot. The plate
-reaches 14 cm from the lidar at the tip of a lobe, so there are 6 cm of margin
-there, and 14 cm at the notches. `OBSTACLE_RANGE_M` and `led_view_color()` are in
-`include/led_view.h` and `src/led_view.c`; a gradient replaces that one function.
-`LED_SECTORS[i].radius_m` holds the distance from the lidar to each LED, if the
-threshold is ever measured from the edge.
-
-The lidar sees the robot's own structure: a mast or a cable passing within 20 cm of
-it keeps its LEDs red until that sector is masked.
+The gradient is interpolated in HSV, its hue turning through the warm side, so its
+middle is a muted gold rather than the brown a mix in RGB gives. The colours are a
+screen's, and the strip shows them as a screen would: the driver applies a screen's
+gamma of 2.2, which a WS2812B's linear output lacks, and FastLED's colour correction
+for a typical strip, green at 176 and blue at 240 of 255 (`BOARD_LED_GAIN_*`), since
+its green and blue outshine its red. Without them every mix comes out pale and cold.
+The distances
+are measured from the lidar, not from the edge of the robot. Both are in
+`include/led_view.h`, and the colour in `led_view_color()` in `src/led_view.c`.
+`LED_SECTORS[i].radius_m` holds the distance from the lidar to each LED, if they are
+ever measured from the edge.
 
 Several lidars: add a line to `lidar_sources` in `src/app_main.c`, a topic and the
-lidar's rotation in `base_link`. The ring shows the nearest of them and turns amber
-as soon as one is silent.
+lidar's rotation in `base_link`. The ring shows the nearest of them and turns dim
+white as soon as one is silent.
 
 ### The strip
 
-94 LEDs on a 94 cm strip, 1 per cm, laid along the outline of the plate. The drawing
-it was measured on is `base_link+otos Drawing.svg`, a top view that shares ROS's axes,
-`+x` being the lobe on the right, one of the three wheels. The strip starts and ends
-at the middle of the chamfer of the notch at -60 degrees, and runs anticlockwise seen
-from above: first towards the `+x` lobe. The direction is not fixed on the robot yet;
-`DIRECTION` in `tools/gen_led_map.py` flips it.
+The ring is the first 94 cm of a 60 LEDs per metre strip: 57 LEDs, 56 of which
+measure 92 cm on the test strip, laid along the
+outline of the plate. Nothing past 94 cm lights: every frame carries 300 LEDs
+(`BOARD_LED_STRIP_PIXELS`), and those past the ring are black, since a WS2812B keeps
+its last colour until told otherwise. A longer test strip, up to a 5 m reel, stays
+dark beyond the ring; on the final strip the extra data leaves its far end. The test
+strip's first four LEDs were dead, and the first of them stopped the signal for the
+rest: they are cut off. The drawing it was measured on is
+`base_link+otos Drawing.svg`, a top view that shares ROS's axes, `+x` being the lobe
+on the right, one of the three wheels. LED 0 sits at the middle of the chamfer of the
+notch at -60 degrees, and the strip runs anticlockwise seen from above: first towards
+the `+x` lobe. The direction is not fixed on the robot yet; `DIRECTION` in
+`tools/gen_led_map.py` flips it.
 
-The outline is 932 mm and the strip 940 mm, so each LED covers 1/94 of the outline,
-whatever the slack. Seen from the lidar a LED spans from 1.6 degrees along the lobes'
-sides to 8.7 degrees at the notches, and the spans tile the circle: each direction
-belongs to exactly one LED.
+The outline is 932 mm and the ring 936 mm, so it is laid on the outline
+proportionally, each LED covering 1/57 of it. Seen from the lidar a LED spans from
+2.8 degrees along the lobes' sides to 12.5 degrees at the notches, and the spans tile
+the circle: each direction belongs to exactly one LED. A ring shorter than the outline
+keeps its pitch instead, and its first and last LED share the gap.
 
 `tools/gen_led_map.py` computes `include/led_map.h` from the outline's 18 vertices.
 Change the LED count, the start or the direction there and run it: the output is
@@ -105,16 +115,17 @@ committed, the firmware build needs no Python.
 | Debug output | none | GP0 is UART0's TX, so the UART console is off; `imu_led_pico/status` stands in for it, and USB carries the network link |
 | LED | on-board | blinks fast while waiting for the host, lit while the IMU answers |
 
-**Power the strip from its own 5 V supply, never from the Pico's VBUS.** 94 LEDs lit
-white at full scale draw up to 5.6 A. The firmware caps the output at 48 of 255
-(`BOARD_LED_BRIGHTNESS`), which keeps green or red alone under 0.5 A. Connect the
+**Power the strip from its own 5 V supply, never from the Pico's VBUS.** The ring's
+57 LEDs lit white at full scale draw up to 3.4 A. The firmware caps the output at 160
+of 255 (`BOARD_LED_BRIGHTNESS`); the gradient's colours are dark once
+gamma-corrected, and the ring draws under 0.3 A. Connect the
 supply's ground to the Pico's and put 1000 uF across the strip's supply.
 
-A WS2812B's input high starts at 0.7 times its supply, 3.5 V at 5 V. Many strips
-and matrices take the Pico's 3.3 V anyway, as in
-[Raspberry Pi's own example](https://www.raspberrypi.com/news/how-to-power-loads-of-leds-with-a-single-raspberry-pi-pico/);
-the robot's strip does not, while a matrix on the same pin and supply lights. It
-needs DIN at 5 V, from one of:
+GP0 drives DIN directly through 470 ohms in series. A WS2812B's input high starts at
+0.7 times its supply, 3.5 V at 5 V, but the robot's strip takes the Pico's 3.3 V, as
+in
+[Raspberry Pi's own example](https://www.raspberrypi.com/news/how-to-power-loads-of-leds-with-a-single-raspberry-pi-pico/).
+A strip that does not would need DIN at 5 V, from one of:
 
 * a 74AHCT125 powered at 5 V, GP0 into `1A`, `1Y` to DIN through 330 ohms, `1OE`
   grounded: non-inverting, nothing to change in the firmware;
@@ -187,7 +198,7 @@ flowchart TB
 | TinyUSB task | 22 | the USB device and its network function |
 
 `scan_cb()` hands its result to the application task under a critical section: a copy
-of 94 floats and a stamp.
+of 57 floats and a stamp.
 
 ### Lifecycle
 
@@ -213,9 +224,10 @@ changes read back on its pin during 100 us of one, and the colour of LED 0; the
 lowest the FreeRTOS heap has been.
 
 A strip that stays dark while the frames go out and the pin toggles, about 100
-changes, is a wiring fault: data into the `DOUT` end instead of `DIN`, the data on
-the wrong pin, the strip unpowered, or a 3.3 V signal too low for a strip at 5 V,
-whose input high starts at 3.5 V.
+changes, is a wiring fault or a dead first LED: data into the `DOUT` end instead of
+`DIN`, the data on the wrong pin, the strip unpowered, a 3.3 V signal too low for a
+strip at 5 V, or a first LED that loads DIN down and passes nothing on. Cut that LED
+off and change `LED_COUNT`.
 
 ## Check
 
@@ -241,8 +253,9 @@ tools/fake_scan.py --sweep 20                  # a red spot turning at 20 deg/s
 tools/fake_scan.py --missed 0.3                # 30 % of the beams report 0: still green
 ```
 
-With the lidar, run its driver, then bring a hand to each lobe and each notch and
-check that the LEDs facing it turn red and the others stay green. `/scan` is
+With the lidar, run its driver, then bring a hand towards each lobe and each notch
+and check that the LEDs facing it go from forest green through gold to carmine, and
+the others stay green. `/scan` is
 published in `laser_frame`, which the YDLIDAR launch file of HARP3_ROS places at
 `base_link` with no rotation; a lidar mounted turned needs its angle in
 `lidar_sources`.

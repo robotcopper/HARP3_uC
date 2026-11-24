@@ -9,6 +9,52 @@
 #define BREATH_MIN 20u
 #define BREATH_MAX 128u
 
+/* The ends of the gradient in HSV, as a screen shows them: carmine, #960018, near,
+   and forest green, #228B22, far. The hue turns through olive and gold, not blue. */
+#define NEAR_HUE_DEG (-9.6f)
+#define NEAR_SAT 1.0f
+#define NEAR_VAL (150.0f / 255.0f)
+#define FAR_HUE_DEG 120.0f
+#define FAR_SAT (105.0f / 139.0f)
+#define FAR_VAL (139.0f / 255.0f)
+
+/* Session open, a lidar silent: dim white, outside the gradient. */
+#define NO_SCAN_LEVEL 96u
+
+/* Hue in degrees, saturation and value in [0, 1]. */
+static led_rgb_t from_hsv(float hue_deg, float sat, float val) {
+  float h = fmodf(hue_deg + 360.0f, 360.0f) / 60.0f;
+  float c = val * sat;
+  float x = c * (1.0f - fabsf(fmodf(h, 2.0f) - 1.0f));
+  float r = 0.0f;
+  float g = 0.0f;
+  float b = 0.0f;
+  switch ((int)h) {
+    case 0:
+      r = c, g = x;
+      break;
+    case 1:
+      r = x, g = c;
+      break;
+    case 2:
+      g = c, b = x;
+      break;
+    case 3:
+      g = x, b = c;
+      break;
+    case 4:
+      r = x, b = c;
+      break;
+    default:
+      r = c, b = x;
+      break;
+  }
+  float m = val - c;
+  led_rgb_t color = {(uint8_t)lroundf(255.0f * (r + m)), (uint8_t)lroundf(255.0f * (g + m)),
+                     (uint8_t)lroundf(255.0f * (b + m))};
+  return color;
+}
+
 /* Angle in [0, 2 pi). */
 static float wrap_2pi(float angle) {
   float a = fmodf(angle, TWO_PI);
@@ -16,7 +62,7 @@ static float wrap_2pi(float angle) {
 }
 
 static bool beam_is_valid(float range, float range_min, float range_max) {
-  if (!isfinite(range) || range <= 0.0f) {
+  if (!isfinite(range) || range < IGNORE_RANGE_M) {
     return false;
   }
   if (range_min > 0.0f && range < range_min) {
@@ -86,13 +132,15 @@ void led_view_merge(float *dst, const float *src) {
 }
 
 led_rgb_t led_view_color(float range_m) {
-  led_rgb_t color = {0, 0, 0};
-  if (range_m < OBSTACLE_RANGE_M) {
-    color.r = 255;
-  } else {
-    color.g = 255;
+  /* 0 at IGNORE_RANGE_M and nearer, 1 at FAR_RANGE_M and beyond. */
+  float t = (range_m - IGNORE_RANGE_M) / (FAR_RANGE_M - IGNORE_RANGE_M);
+  if (!(t < 1.0f)) {
+    t = 1.0f;
+  } else if (t < 0.0f) {
+    t = 0.0f;
   }
-  return color;
+  return from_hsv(NEAR_HUE_DEG + t * (FAR_HUE_DEG - NEAR_HUE_DEG), NEAR_SAT + t * (FAR_SAT - NEAR_SAT),
+                  NEAR_VAL + t * (FAR_VAL - NEAR_VAL));
 }
 
 void led_view_render(led_rgb_t *out, const float *led_range, led_view_mode_t mode, uint32_t time_ms) {
@@ -104,8 +152,9 @@ void led_view_render(led_rgb_t *out, const float *led_range, led_view_mode_t mod
       }
       return;
     case LED_VIEW_NO_SCAN:
-      flat.r = 128;
-      flat.g = 48;
+      flat.r = NO_SCAN_LEVEL;
+      flat.g = NO_SCAN_LEVEL;
+      flat.b = NO_SCAN_LEVEL;
       break;
     case LED_VIEW_WAITING_HOST:
     default: {

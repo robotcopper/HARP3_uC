@@ -52,6 +52,10 @@ static int count_below(const float *led, float limit) {
   return n;
 }
 
+static bool is_color(led_rgb_t c, int r, int g, int b) {
+  return abs(c.r - r) <= 1 && abs(c.g - g) <= 1 && abs(c.b - b) <= 1;
+}
+
 static void test_map_tiles_the_circle(void) {
   float total = 0.0f;
   for (int i = 0; i < LED_COUNT; ++i) {
@@ -65,7 +69,7 @@ static void test_map_tiles_the_circle(void) {
   }
   CHECK(fabsf(total - 2.0f * PI_F) < 1e-3f);
   /* The strip starts in the notch at -60 degrees and the first LED runs towards +x. */
-  CHECK(fabsf(LED_SECTORS[0].start_rad - (-PI_F / 3.0f)) < 1e-3f);
+  CHECK(led_at(-PI_F / 3.0f) == 0);
   CHECK(led_at(0.0f) > 0 && led_at(0.0f) < LED_COUNT / 2);
   for (int i = 0; i < 360; ++i) {
     CHECK(led_at((float)i * PI_F / 180.0f) >= 0);
@@ -78,15 +82,15 @@ static void test_obstacle_lights_its_led(void) {
     led_view_clear(led);
     full_scan(5.0f);
     int beam = (int)lroundf(((float)deg * PI_F / 180.0f + PI_F) / full_increment());
-    ranges[beam] = 0.15f;
+    ranges[beam] = IGNORE_RANGE_M;
     led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
     int expected = led_at(-PI_F + (float)beam * full_increment());
-    CHECK(led[expected] < OBSTACLE_RANGE_M);
+    CHECK(led[expected] < FAR_RANGE_M);
     /* One beam is under a degree: at most the LED and a neighbour or two. */
-    CHECK(count_below(led, OBSTACLE_RANGE_M) >= 1 && count_below(led, OBSTACLE_RANGE_M) <= 3);
-    CHECK(led_view_color(led[expected]).r == 255 && led_view_color(led[expected]).g == 0);
+    CHECK(count_below(led, FAR_RANGE_M) >= 1 && count_below(led, FAR_RANGE_M) <= 3);
+    CHECK(is_color(led_view_color(led[expected]), 150, 0, 24));
     int far = (expected + LED_COUNT / 2) % LED_COUNT;
-    CHECK(led_view_color(led[far]).g == 255 && led_view_color(led[far]).r == 0);
+    CHECK(is_color(led_view_color(led[far]), 34, 139, 34));
   }
 }
 
@@ -110,6 +114,10 @@ static void test_invalid_beams_show_nothing(void) {
   led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
   CHECK(count_below(led, INFINITY) == 0);
 
+  full_scan(0.13f); /* the robot's own structure, though the lidar measures it */
+  led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
+  CHECK(count_below(led, INFINITY) == 0);
+
   full_scan(20.0f); /* beyond its range */
   led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
   CHECK(count_below(led, INFINITY) == 0);
@@ -118,6 +126,11 @@ static void test_invalid_beams_show_nothing(void) {
   full_scan(3.0f);
   led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.0f, 0.0f, 0.0f);
   CHECK(count_below(led, INFINITY) == LED_COUNT);
+
+  led_view_clear(led);
+  full_scan(IGNORE_RANGE_M);
+  led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
+  CHECK(count_below(led, FAR_RANGE_M) == LED_COUNT);
 }
 
 static void test_yaw_turns_the_scan(void) {
@@ -125,10 +138,10 @@ static void test_yaw_turns_the_scan(void) {
   led_view_clear(led);
   full_scan(5.0f);
   int beam = BEAMS / 2; /* angle 0 in the lidar's frame */
-  ranges[beam] = 0.1f;
+  ranges[beam] = 0.15f;
   led_view_add_scan(led, -PI_F, full_increment(), ranges, BEAMS, 0.08f, 12.0f, PI_F / 2.0f);
-  CHECK(led[led_at(PI_F / 2.0f)] < OBSTACLE_RANGE_M);
-  CHECK(led[led_at(0.0f)] > OBSTACLE_RANGE_M);
+  CHECK(led[led_at(PI_F / 2.0f)] < FAR_RANGE_M);
+  CHECK(led[led_at(0.0f)] > FAR_RANGE_M);
 }
 
 static void test_sparse_scan_reaches_every_led(void) {
@@ -148,22 +161,22 @@ static void test_seam_of_a_scan_from_zero(void) {
   /* 0 to 2 pi: the LEDs behind the robot sit on the seam. */
   led_view_clear(led);
   full_scan(5.0f);
-  ranges[0] = 0.1f;
+  ranges[0] = 0.15f;
   led_view_add_scan(led, 0.0f, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
-  CHECK(led[led_at(0.0f)] < OBSTACLE_RANGE_M);
+  CHECK(led[led_at(0.0f)] < FAR_RANGE_M);
 
   led_view_clear(led);
   full_scan(5.0f);
-  ranges[BEAMS - 1] = 0.1f;
+  ranges[BEAMS - 1] = 0.15f;
   led_view_add_scan(led, 0.0f, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
-  CHECK(led[led_at(-full_increment())] < OBSTACLE_RANGE_M);
+  CHECK(led[led_at(-full_increment())] < FAR_RANGE_M);
 
   /* The same, across the +-pi seam of the robot. */
   led_view_clear(led);
   full_scan(5.0f);
-  ranges[BEAMS / 2] = 0.1f; /* angle pi */
+  ranges[BEAMS / 2] = 0.15f; /* angle pi */
   led_view_add_scan(led, 0.0f, full_increment(), ranges, BEAMS, 0.08f, 12.0f, 0.0f);
-  CHECK(led[led_at(PI_F - 0.001f)] < OBSTACLE_RANGE_M || led[led_at(-PI_F + 0.001f)] < OBSTACLE_RANGE_M);
+  CHECK(led[led_at(PI_F - 0.001f)] < FAR_RANGE_M || led[led_at(-PI_F + 0.001f)] < FAR_RANGE_M);
 }
 
 static void test_partial_scan(void) {
@@ -174,23 +187,23 @@ static void test_partial_scan(void) {
   for (int i = 0; i < n; ++i) {
     ranges[i] = 1.0f;
   }
-  ranges[0] = 0.1f; /* -90 degrees */
+  ranges[0] = 0.15f; /* -90 degrees */
   led_view_add_scan(led, -PI_F / 2.0f, PI_F / n, ranges, n, 0.08f, 12.0f, 0.0f);
   CHECK(led[led_at(0.0f)] == 1.0f);
   CHECK(led[led_at(PI_F)] == LED_NO_RANGE);
-  CHECK(led[led_at(-PI_F / 2.0f + 0.001f)] < OBSTACLE_RANGE_M);
+  CHECK(led[led_at(-PI_F / 2.0f + 0.001f)] < FAR_RANGE_M);
   /* A partial scan whose angle_min is above pi in the robot's frame, by yaw. */
   led_view_clear(led);
   led_view_add_scan(led, -PI_F / 2.0f, PI_F / n, ranges, n, 0.08f, 12.0f, PI_F);
   CHECK(led[led_at(PI_F)] == 1.0f);
   CHECK(led[led_at(0.0f)] == LED_NO_RANGE);
-  CHECK(led[led_at(PI_F / 2.0f + 0.001f)] < OBSTACLE_RANGE_M);
+  CHECK(led[led_at(PI_F / 2.0f + 0.001f)] < FAR_RANGE_M);
 }
 
 static void test_bad_scans_change_nothing(void) {
   float led[LED_COUNT];
   led_view_clear(led);
-  full_scan(0.1f);
+  full_scan(0.15f);
   led_view_add_scan(led, -PI_F, 0.0f, ranges, BEAMS, 0.08f, 12.0f, 0.0f);
   led_view_add_scan(led, -PI_F, -0.01f, ranges, BEAMS, 0.08f, 12.0f, 0.0f);
   led_view_add_scan(led, -PI_F, NAN, ranges, BEAMS, 0.08f, 12.0f, 0.0f);
@@ -213,28 +226,37 @@ static void test_keeps_the_nearer(void) {
 }
 
 static void test_color(void) {
-  CHECK(led_view_color(0.0f).r == 255 && led_view_color(0.0f).g == 0);
-  CHECK(led_view_color(0.1999f).r == 255);
-  CHECK(led_view_color(OBSTACLE_RANGE_M).g == 255 && led_view_color(OBSTACLE_RANGE_M).r == 0);
-  CHECK(led_view_color(LED_NO_RANGE).g == 255);
-  CHECK(led_view_color(LED_NO_RANGE).b == 0);
+  /* Carmine near, forest green far. */
+  CHECK(is_color(led_view_color(IGNORE_RANGE_M), 150, 0, 24));
+  CHECK(is_color(led_view_color(FAR_RANGE_M), 34, 139, 34));
+  /* Halfway, olive gold: through the warm hues, not blue, and not brown. */
+  CHECK(is_color(led_view_color((IGNORE_RANGE_M + FAR_RANGE_M) / 2.0f), 145, 134, 18));
+  /* Nearer is redder. */
+  for (float r = IGNORE_RANGE_M; r < FAR_RANGE_M; r += 0.02f) {
+    CHECK(led_view_color(r).r >= led_view_color(r + 0.02f).r);
+  }
+  /* Clamped at both ends, and with nothing in sight. */
+  CHECK(is_color(led_view_color(0.0f), 150, 0, 24));
+  CHECK(is_color(led_view_color(2.0f), 34, 139, 34));
+  CHECK(is_color(led_view_color(LED_NO_RANGE), 34, 139, 34));
+  CHECK(is_color(led_view_color(NAN), 34, 139, 34));
 }
 
 static void test_render(void) {
   led_rgb_t out[LED_COUNT];
   float led[LED_COUNT];
   led_view_clear(led);
-  led[10] = 0.1f;
+  led[10] = IGNORE_RANGE_M;
 
   led_view_render(out, led, LED_VIEW_SCAN, 0);
-  CHECK(out[10].r == 255 && out[10].g == 0);
-  CHECK(out[11].g == 255 && out[11].r == 0);
+  CHECK(is_color(out[10], 150, 0, 24));
+  CHECK(is_color(out[11], 34, 139, 34));
 
   /* Without a scan nothing is green, whatever the ranges hold. */
   led_view_clear(led);
   led_view_render(out, led, LED_VIEW_NO_SCAN, 0);
   for (int i = 0; i < LED_COUNT; ++i) {
-    CHECK(out[i].r > 0 && out[i].g < out[i].r && out[i].b == 0);
+    CHECK(out[i].r > 0 && out[i].r == out[i].g && out[i].g == out[i].b);
   }
 
   for (uint32_t t = 0; t < 4000; t += 50) {

@@ -6,7 +6,8 @@
  *                at the sensor read. Frame imu_link, in the sensor's axes.
  *   scan         sensor_msgs/LaserScan, subscribed, best effort. Each LED of the
  *                ring shows the nearest obstacle in the directions it faces, from
- *                the lidar: red under OBSTACLE_RANGE_M, green otherwise.
+ *                the lidar: carmine at IGNORE_RANGE_M, under which beams are
+ *                ignored, to forest green from FAR_RANGE_M.
  *   imu_led_pico/status
  *                std_msgs/String every 5 s, best effort. The board's only
  *                console: the strip takes GP0, UART0's TX.
