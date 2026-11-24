@@ -7,6 +7,7 @@ interfaces this firmware is generated from.
 | Directory | Content |
 | --- | --- |
 | [`mobile_base_pico/`](mobile_base_pico/README.md) | mobile base board: three steppers, odometry sensor, limit switches |
+| [`imu_led_pico/`](imu_led_pico/README.md) | IMU and obstacle ring board: BNO085 IMU, WS2812B ring lit from the lidar scan; prototype, on its own subnet 192.168.8.0/24 |
 | `lib/picoros-usb-eth/` | submodule, [picoros-usb-eth](https://github.com/robotcopper/picoros-usb-eth): Pico-ROS over Ethernet over USB, shared by every board |
 | [`benchmarks/`](benchmarks/README.md) | the Pico-ROS and micro-ROS test firmwares and the measurement scripts |
 | [`docs/picoros_vs_microros/`](docs/picoros_vs_microros/README.md) | Pico-ROS and micro-ROS over Zenoh compared: method, results, raw data |
@@ -48,7 +49,8 @@ cmake --build build/rp2040
 ```
 
 The firmware is `build/rp2040/mobile_base_pico.uf2`. The host unit tests run
-with `test/run.sh`.
+with `test/run.sh`. `imu_led_pico/` builds and flashes the same way from its own
+directory, into `build/rp2040/imu_led_pico.uf2`.
 
 ## Flash
 
