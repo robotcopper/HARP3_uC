@@ -11,12 +11,21 @@
 # HARP3_MSGS_SHARE  built harp3_msgs share, to check its hashes too
 # PICOROS_USB_ETH_PATH  picoros-usb-eth checkout holding the Pico-ROS generator
 #                       (default ../lib/picoros-usb-eth)
+#
+# Another firmware reuses this script through its own tools/gen_types.sh, which
+# sets:
+# TYPES_HEADER    name of the generated header  (default mobile_base_types.h)
+# TYPES_OUT_DIR   directory it is written to    (default ../include)
+# WITH_HARP3_MSGS 0 leaves harp3_msgs out       (default 1)
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")/.." && pwd)
 ros_share=${ROS_SHARE:-/opt/ros/lyrical/share}
 harp3_msgs=${HARP3_MSGS:-$HOME/HARP3_ROS/harp3_msgs}
 kit=${PICOROS_USB_ETH_PATH:-$here/../lib/picoros-usb-eth}
+header=${TYPES_HEADER:-mobile_base_types.h}
+out_dir=${TYPES_OUT_DIR:-$here/include}
+with_harp3_msgs=${WITH_HARP3_MSGS:-1}
 generator=$kit/third_party/Pico-ROS/tools/type-gen/generate_type_header.py
 work=$here/build/type-gen
 packages=(builtin_interfaces std_msgs geometry_msgs nav_msgs sensor_msgs std_srvs service_msgs)
@@ -44,7 +53,9 @@ mkdir -p "$work/interfaces"
 for p in "${packages[@]}"; do
   copy_package "$ros_share/$p"
 done
-copy_package "$harp3_msgs"
+if [ "$with_harp3_msgs" = 1 ]; then
+  copy_package "$harp3_msgs"
+fi
 
 if [ ! -x "$work/venv/bin/python" ]; then
   python3 -m venv "$work/venv"
@@ -52,13 +63,14 @@ if [ ! -x "$work/venv/bin/python" ]; then
 fi
 
 (cd "$work" && "$work/venv/bin/python" "$generator" --packages-dir interfaces --output-dir out \
-  --header-file mobile_base_types.h) > "$work/generator.log" 2>&1 ||
+  --header-file "$header") > "$work/generator.log" 2>&1 ||
   { cat "$work/generator.log" >&2; exit 1; }
 
 shares=("$ros_share")
 if [ -n "${HARP3_MSGS_SHARE:-}" ]; then
   shares+=("$HARP3_MSGS_SHARE")
 fi
-python3 "$here/tools/check_type_hashes.py" "$work/out/mobile_base_types.h" "${shares[@]}"
-cp -f "$work/out/mobile_base_types.h" "$here/include/mobile_base_types.h"
-echo "include/mobile_base_types.h updated"
+python3 "$here/tools/check_type_hashes.py" "$work/out/$header" "${shares[@]}"
+mkdir -p "$out_dir"
+cp -f "$work/out/$header" "$out_dir/$header"
+echo "$out_dir/$header updated"
